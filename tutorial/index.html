@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sam-vs-obia 交互教程 · 当 SAM 遇上手写 OBIA</title>
+<style>
+  :root{ --ink:#1c2330; --sub:#5b6472; --line:#e3e7ee; --bg:#ffffff; --code:#101622;
+         --accent:#1976d2; --warn-bg:#fff6e5; --warn-bd:#e6a23c; --note-bg:#f2f7ff; --note-bd:#64a0e0;}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;color:var(--ink);background:var(--bg);line-height:1.75}
+  header{padding:18px 24px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+  header h1{font-size:19px;margin:0}
+  header .done-chip{margin-left:auto;font-size:12px;color:var(--sub)}
+  nav{position:sticky;top:0;background:#fff;border-bottom:1px solid var(--line);padding:8px 24px;display:flex;gap:8px;flex-wrap:wrap;z-index:5}
+  nav a{font-size:13px;color:var(--sub);text-decoration:none;padding:3px 10px;border-radius:12px;border:1px solid transparent}
+  nav a:hover{color:var(--accent);border-color:var(--line)}
+  nav a.cur{color:#fff;background:var(--accent)}
+  main{max-width:980px;margin:0 auto;padding:22px 24px 80px}
+  h2{font-size:20px;margin:38px 0 10px;border-left:4px solid var(--accent);padding-left:10px}
+  h3{font-size:16px;margin:22px 0 8px}
+  p{margin:8px 0}
+  .sub{color:var(--sub);font-size:13px}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;margin:10px 0}
+  th,td{border:1px solid var(--line);padding:6px 9px;text-align:center}
+  th{background:#f6f8fb}
+  td.l{text-align:left}
+  pre{position:relative;background:var(--code);color:#dbe4f0;padding:14px 14px;border-radius:8px;overflow:auto;font-size:12.5px;line-height:1.55}
+  pre code{font-family:Consolas,Menlo,monospace}
+  .copy{position:absolute;top:6px;right:6px;background:#2b3450;color:#cfe0ff;border:0;border-radius:6px;font-size:12px;padding:3px 10px;cursor:pointer}
+  .copy:hover{background:#3a4768}
+  .note{background:var(--note-bg);border-left:4px solid var(--note-bd);padding:8px 12px;margin:10px 0;font-size:13.5px}
+  .warn{background:var(--warn-bg);border-left:4px solid var(--warn-bd);padding:8px 12px;margin:10px 0;font-size:13.5px}
+  .widget{border:1px solid var(--line);border-radius:10px;padding:14px;margin:14px 0;background:#fbfcfe}
+  .widget h4{margin:0 0 8px;font-size:14.5px}
+  .row{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-start}
+  canvas{border:1px solid var(--line);image-rendering:pixelated;background:#fff}
+  img.rgbthumb{border:1px solid var(--line);width:256px;height:256px;image-rendering:pixelated}
+  .stat{font-size:13px;background:#fff;border:1px dashed var(--line);border-radius:8px;padding:8px 10px;min-width:150px}
+  .stat b{font-size:17px;color:var(--accent)}
+  button{background:var(--accent);color:#fff;border:0;border-radius:8px;padding:6px 16px;font-size:13px;cursor:pointer}
+  button.ghost{background:#fff;color:var(--accent);border:1px solid var(--accent)}
+  input[type=range]{width:220px;vertical-align:middle}
+  .bar{height:16px;background:#e8eef7;border-radius:4px;position:relative;margin:4px 0}
+  .bar>i{position:absolute;left:0;top:0;bottom:0;background:var(--accent);border-radius:4px}
+  .bar.o>i{background:#f9a825}.bar.a>i{background:#8d6e63}
+  .bar span{position:absolute;right:6px;top:-2px;font-size:11px;color:var(--ink)}
+  .lbl{font-size:12.5px;color:var(--sub)}
+  .done-cb{font-size:13px;color:var(--sub);margin-top:12px;display:block}
+  .foot{margin-top:60px;border-top:1px solid var(--line);padding-top:14px;font-size:12.5px;color:var(--sub)}
+  @media (max-width:520px){ .imgwrap img{width:100%;height:auto} }
+</style>
+</head>
+<body>
+<header>
+  <h1>sam-vs-obia · 当 SAM 遇上手写 OBIA</h1>
+  <span class="sub">交互教程（数据快照 2026-11-20 实跑）</span>
+  <span class="done-chip" id="doneChip">已完成 0 / 6 节</span>
+</header>
+<nav id="toc">
+  <a href="#s1">1 是什么</a><a href="#s2">2 公平协议</a><a href="#s3">3 边界F计算器</a>
+  <a href="#s4">4 AMG涂写</a><a href="#s5">5 数字总览</a><a href="#s6">6 提示价值</a>
+</nav>
+<main>
+
+<h2 id="s1">1 · 这个项目是什么</h2>
+<p>把 <b>Meta SAM2（零样本，只看真彩色 RGB）</b> 和 <b>手写 OBIA（Baatz &amp; Schäpe 多尺度区域生长，4 波段 + 19 维特征）</b> 放进同一幅 512²×4 波段合成场景（seed=20260829，自带像素级真值 + 图斑真值），用<b>同一套下游分类器与指标代码</b>正面对比。一句话结论：</p>
+<div class="note">SAM 赢<b>边界</b>（边界 F 最高 0.95 vs OBIA 0.48）和<b>速度</b>（GPU 3.2s vs CPU 78s，24×）；输<b>开箱 OA</b>（0.924 vs 0.959）、<b>尺度可控性</b>与<b>默认覆盖率</b>（默认阈值漏掉 23.2% 场景）。提示把同一图斑的 IoU 从自动模式 0.376 → 点 0.602 → 框 0.870。</div>
+<p class="sub">左图是 SAM 真正看到的输入（64² 缩略，原图 512²）。注意它没有 NIR——零样本的真实约束。</p>
+<div class="imgwrap"><img class="rgbthumb" id="rgbImg" alt="scene rgb"></div>
+<label class="done-cb"><input type="checkbox" data-sec="s1"> 本节打卡</label>
+
+<h2 id="s2">2 · 对比怎么做到公平</h2>
+<p>三个产物形态完全不同的方法（手写 MRS label 图 / SLIC 超像素 / SAM 重叠 mask 集）要同台，只有一条路：<b>全部变成"非重叠 label 图"，过同一道协议门</b>——</p>
+<pre><code>label 图 → 19 维图斑特征 → 同种子 RandomForest → 回填分类图 → 三指标
+                                                    ├─ 全图 OA
+                                                    ├─ 椒盐率（3×3 多数类不一致像素占比）
+                                                    └─ 边界贴合 F1（tol=2px 双向匹配）
+                                                         ├─ cls_bF1：分类图边界 vs 地类真值
+                                                         └─ seg_bF1：分割 label 图边界 vs 图斑真值</code></pre>
+<p>指标/特征/分类代码全部 <b>sys.path 桥接自姊妹项目 obia-segmentation（零拷贝）</b>，测试断言两边是同一个函数对象——杜绝"两边指标各自演化"的暗坑。SAM 的 mask 按 predicted_iou 降序"先到先得"涂写成 label 图；没被任何 mask 盖住的像素记为未覆盖区（如实在账）。</p>
+<div class="warn"><b>两口径为什么必须分开</b>：同类相邻田块的边界在"地类真值"里不存在，cls_bF1 天然偏宽容；衡量<b>分割本身</b>要用 seg_bF1 对图斑真值。混用口径是对比实验里最隐蔽的造假方式。</div>
+<label class="done-cb"><input type="checkbox" data-sec="s2"> 本节打卡</label>
+
+<h2 id="s3">3 · 动手玩：边界 F 计算器</h2>
+<p>下面是真实结果 label 图的中心 256² 窗口（4×4 众数下采样到 64²）。拖动容差滑块，<b>实时重算</b> seg_bF1（分割边界 vs 图斑真值边界）——这就是 OBIA 参数敏感性表里那一列数字的来历。</p>
+<div class="widget">
+  <h4>边界 F 计算器 <span class="sub">（勾选 = 边界叠加显示）</span></h4>
+  <div class="row">
+    <div><div class="lbl">图斑真值（70 田块）</div><canvas id="cP" width="256" height="256" style="width:256px"></canvas></div>
+    <div><div class="lbl" id="w1label">手写 OBIA（scale=10，440 对象）</div><canvas id="cL" width="256" height="256" style="width:256px"></canvas></div>
+    <div class="stat">
+      方法：<select id="w1sel">
+        <option value="obia_scale10">手写 OBIA (scale=10)</option>
+        <option value="slic_440">SLIC (n=440)</option>
+        <option value="sam_pps32">SAM2 默认 AMG (pps=32)</option>
+        <option value="sam_pps32_permissive">SAM2 放宽阈值</option>
+      </select><br><br>
+      容差 tol = <b id="w1tolv">2</b> px<br>
+      <input type="range" id="w1tol" min="0" max="5" value="2"><br><br>
+      精确率 P = <b id="w1p">-</b><br>
+      召回率 R = <b id="w1r">-</b><br>
+      <span style="font-size:15px">F1 = <b id="w1f">-</b></span>
+    </div>
+  </div>
+  <p class="sub">P = 预测边界落在真值边界 tol 邻域内的比例；R = 真值边界被预测命中的比例。tol=0 时 1px 的错位就清零——遥感里"贴边"从来都是带容差说话的。试试 SAM 默认档：它对象少（28 个）但 seg_bF1 反而高——<b>切出来的段边界准</b>，这正是 README 的核心发现之一。</p>
+</div>
+<label class="done-cb"><input type="checkbox" data-sec="s3"> 本节打卡</label>
+
+<h2 id="s4">4 · 动手玩：AMG mask 是怎么变成"分割图"的</h2>
+<p>AMG 返回几百个<b>互相重叠</b>的候选 mask。涂写规则：按 predicted_iou <b>降序</b>，每个像素归第一个（最高分）盖住它的 mask（先到先得）；谁都没盖住 → <b>未覆盖</b>。点 ▶ 看涂写过程（SAM2 默认 AMG，pps=32，真实数据前 6 大对象）：</p>
+<div class="widget">
+  <h4>AMG 涂写演示 <span class="sub" id="w2note"></span></h4>
+  <div class="row">
+    <div><div class="lbl">涂写进度</div><canvas id="cM" width="256" height="256" style="width:256px"></canvas></div>
+    <div class="stat">
+      <button id="w2play">▶ 播放</button> <button class="ghost" id="w2reset">重置</button><br><br>
+      步数 <b id="w2step">0</b> / <span id="w2total">-</span><br>
+      已涂对象 <b id="w2obj">0</b><br>
+      未覆盖 <b id="w2unc">100%</b>
+    </div>
+  </div>
+  <p class="sub">默认阈值下全图涂完后仍有 <b>23.2%</b> 灰色空洞（模型"不确定"的提案被过滤）——这就是"SAM 默认档漏 23% 场景"的直观来源。README 里的放宽阈值档（iou≥0.6/stab≥0.85）把空洞压到 1.4%。</p>
+</div>
+<label class="done-cb"><input type="checkbox" data-sec="s4"> 本节打卡</label>
+
+<h2 id="s5">5 · 数字总览（四方同台）</h2>
+<div class="widget">
+  <h4>主对比 <span class="sub">同一协议 · 同一份指标代码 · 2026-11-20 实跑</span></h4>
+  <table id="mainTable"></table>
+  <div class="row" style="margin-top:10px">
+    <div class="stat" style="flex:1;min-width:240px">
+      <b>尺度响应不一样</b><br>
+      <span id="sweepTxt" class="sub"></span>
+    </div>
+    <div class="stat" style="flex:1;min-width:240px">
+      <b>阈值 = SAM 的行为开关</b><br>
+      <button class="ghost" id="thBtn">切换：默认 → 放宽</button>
+      <div id="thTxt" class="sub" style="margin-top:6px"></div>
+    </div>
+  </div>
+</div>
+<label class="done-cb"><input type="checkbox" data-sec="s5"> 本节打卡</label>
+
+<h2 id="s6">6 · 动手玩：提示工程值多少钱</h2>
+<p>同一批 18 个分层抽样图斑，三种模式的图斑 IoU（auto-containment = AMG label 图里覆盖图斑质心的分割段，即"不开提示"的反事实基线）：</p>
+<div class="widget">
+  <h4>提示三级阶梯</h4>
+  <div id="ladder" style="max-width:520px"></div>
+  <table style="margin-top:10px"><tbody>
+    <tr><th></th><th>IoU 均值</th><th>中位数</th><th>覆盖率</th><th>越界率 spill</th><th>窗口边界F</th><th>耗时</th></tr>
+    <tr id="rowPoint"><td class="l">点提示（质心 1 点）</td></tr>
+    <tr id="rowBox"><td class="l">框提示（图斑 bbox）</td></tr>
+  </tbody></table>
+  <div class="warn"><b>点的失败模式</b>：覆盖率 0.92 很高，但越界率 0.32——点告诉 SAM"从哪开始"，没说"到哪停"，mask 顺着同类光谱漫溢到邻斑。框把 spill 压到 0.089。地类差异：点提示下 builtup 只有 IoU 0.26（块状纹理碎切），框提到 0.68。</div>
+</div>
+<p>三种选择：要矢量图斑+可解释特征+高 OA 自动分类 → <b>OBIA</b>；要贴边界的快速勾绘/样本预标注 → <b>SAM2（+框提示）</b>；要"对象≈图斑"的尺度语义 → 只有 <b>OBIA</b> 的 scale 参数给得了。</p>
+<label class="done-cb"><input type="checkbox" data-sec="s6"> 本节打卡</label>
+
+<div class="foot">
+  数据快照：results/summary.json（2026-11-20 实跑，test/test.py 8 断言复算一致）·
+  图文完整版见 TUTORIAL.md 与 README.md ·
+  仓库 <a href="https://github.com/dingdjfjs-star/sam-vs-obia">dingdjfjs-star/sam-vs-obia</a> ·
+  姊妹项目 obia-segmentation（手写 OBIA 全流程）
+</div>
+</main>
+
+<script src="data.js"></script>
+<script>
+const D = TUTORIAL_DATA;
+document.getElementById("rgbImg").src = D.scene_rgb64;
+document.getElementById("w2note").textContent = D.masks_note;
+document.getElementById("w2total").textContent = D.masks_seq.length;
+
+/* ---------- 调色板 ---------- */
+function palette(seed){ // 确定性伪随机上色
+  let s = seed>>>0 || 1;
+  const rnd = ()=> (s = (s*1103515245+12345)>>>0) / 4294967296;
+  const cols = [[0,0,0]];
+  for(let i=1;i<256;i++){ cols.push([40+rnd()*180|0, 40+rnd()*180|0, 40+rnd()*180|0]); }
+  return cols;
+}
+const PAL = { truth: [[0,0,0],[47,111,208],[46,125,50],[192,202,51],[215,168,110],[117,117,117]] };
+
+function drawLabels(canvas, lab, pal, showBound, boundColor){
+  const ctx = canvas.getContext("2d");
+  const K = Math.max(...lab.flat());
+  const colors = pal===PAL.truth ? PAL.truth : palette(K*7919+13);
+  const n = lab.length, m = lab[0].length;
+  const img = ctx.createImageData(m*4, n*4);   // 64² → 256² 最近邻
+  // 边界集
+  const bnd = new Set();
+  if(showBound){
+    for(let i=0;i<n;i++)for(let j=0;j<m;j++){
+      if(j+1<m && lab[i][j]!==lab[i][j+1]) bnd.add(i*m+j);
+      if(i+1<n && lab[i][j]!==lab[i+1][j]) bnd.add(i*m+j);
+    }
+  }
+  for(let i=0;i<n;i++)for(let j=0;j<m;j++){
+    let c;
+    if(showBound && bnd.has(i*m+j)) c = boundColor;
+    else { const v = lab[i][j]; c = colors[v] || [200,200,200]; }
+    for(let di=0;di<4;di++)for(let dj=0;dj<4;dj++){
+      const o = ((i*4+di)*m*4 + (j*4+dj))*4;
+      img.data[o]=c[0]; img.data[o+1]=c[1]; img.data[o+2]=c[2]; img.data[o+3]=255;
+    }
+  }
+  ctx.putImageData(img,0,0);
+}
+function drawMaskFrame(canvas, painted, K){
+  const ctx = canvas.getContext("2d");
+  const n=painted.length, m=painted[0].length;
+  const cols = palette(K*104729+7);
+  const img = ctx.createImageData(m*4,n*4);
+  let zero=0;
+  for(let i=0;i<n;i++)for(let j=0;j<m;j++){
+    const v=painted[i][j];
+    let c=[225,228,233];           // 未覆盖 = 浅灰
+    if(v>0) c=cols[v];
+    else zero++;
+    for(let di=0;di<4;di++)for(let dj=0;dj<4;dj++){
+      const o=((i*4+di)*m*4+(j*4+dj))*4;
+      img.data[o]=c[0];img.data[o+1]=c[1];img.data[o+2]=c[2];img.data[o+3]=255;
+    }
+  }
+  ctx.putImageData(img,0,0);
+  return zero/(n*m);
+}
+
+/* ---------- W1 边界 F 计算器 ---------- */
+function dilate(set, n, m, iters){ // 4 邻域膨胀
+  let cur = new Set(set);
+  for(let t=0;t<iters;t++){
+    const nxt = new Set(cur);
+    cur.forEach(v=>{
+      const i=(v/m)|0, j=v%m;
+      if(i>0)nxt.add(v-m); if(i<n-1)nxt.add(v+m);
+      if(j>0)nxt.add(v-1); if(j<m-1)nxt.add(v+1);
+    });
+    cur = nxt;
+  }
+  return cur;
+}
+function boundaryF(pred, truth, tol){
+  const n=pred.length,m=pred[0].length;
+  const bp=new Set(), bt=new Set();
+  for(let i=0;i<n;i++)for(let j=0;j<m;j++){
+    if(j+1<m&&pred[i][j]!==pred[i][j+1])bp.add(i*m+j);
+    if(i+1<n&&pred[i][j]!==pred[i+1][j])bp.add(i*m+j);
+    if(j+1<m&&truth[i][j]!==truth[i][j+1])bt.add(i*m+j);
+    if(i+1<n&&truth[i][j]!==truth[i+1][j])bt.add(i*m+j);
+  }
+  const dp=dilate(bp,n,m,tol), dt=dilate(bt,n,m,tol);
+  let hitP=0,hitR=0;
+  bp.forEach(v=>{if(dt.has(v))hitP++;});
+  bt.forEach(v=>{if(dp.has(v))hitR++;});
+  const P=hitP/Math.max(bp.size,1), R=hitR/Math.max(bt.size,1);
+  return {P,R,F:2*P*R/Math.max(P+R,1e-9)};
+}
+const w1sel=document.getElementById("w1sel"), w1tol=document.getElementById("w1tol");
+const NAMES={"obia_scale10":"手写 OBIA（scale=10，440 对象）","slic_440":"SLIC（n=440）",
+             "sam_pps32":"SAM2 默认 AMG（pps=32）","sam_pps32_permissive":"SAM2 放宽阈值"};
+function w1update(){
+  const name=w1sel.value, tol=+w1tol.value;
+  document.getElementById("w1tolv").textContent=tol;
+  document.getElementById("w1label").textContent=NAMES[name];
+  const lab=D.labels64[name];
+  drawLabels(document.getElementById("cP"), D.parcels64, null, true, [255,255,255]);
+  drawLabels(document.getElementById("cL"), lab, null, true, [255,210,0]);
+  const r=boundaryF(lab, D.parcels64, tol);
+  document.getElementById("w1p").textContent=r.P.toFixed(3);
+  document.getElementById("w1r").textContent=r.R.toFixed(3);
+  document.getElementById("w1f").textContent=r.F.toFixed(3);
+}
+w1sel.onchange=w1update; w1tol.oninput=w1update; w1update();
+
+/* ---------- W2 AMG 涂写演示 ---------- */
+let w2i=0, w2timer=null;
+function w2render(){
+  const frames=D.masks_seq;
+  const painted = w2i===0 ? frames[0].map(r=>r.map(()=>0)) : frames[Math.min(w2i,frames.length)-1];
+  const K = Math.max(...painted.flat());
+  const unc = drawMaskFrame(document.getElementById("cM"), painted, Math.max(K,1));
+  document.getElementById("w2step").textContent=w2i;
+  document.getElementById("w2obj").textContent=Math.max(...painted.flat());
+  document.getElementById("w2unc").textContent=(unc*100).toFixed(1)+"%";
+}
+document.getElementById("w2play").onclick=()=>{
+  if(w2timer){clearInterval(w2timer);w2timer=null;document.getElementById("w2play").textContent="▶ 播放";return;}
+  document.getElementById("w2play").textContent="⏸ 暂停";
+  w2timer=setInterval(()=>{
+    if(w2i>=D.masks_seq.length){clearInterval(w2timer);w2timer=null;document.getElementById("w2play").textContent="▶ 播放";return;}
+    w2i++;w2render();
+  },700);
+};
+document.getElementById("w2reset").onclick=()=>{w2i=0;if(w2timer){clearInterval(w2timer);w2timer=null;document.getElementById("w2play").textContent="▶ 播放";}w2render();};
+w2render();
+
+/* ---------- W3 主对比表 + 阈值开关 + 尺度响应 ---------- */
+const MAINROW=[["obia_scale10","手写 OBIA (scale=10)"],["slic_440","SLIC (n=440)"],
+               ["sam_pps32","SAM2 默认 AMG"],["sam_pps32_permissive","SAM2 放宽阈值"]];
+const mt=document.getElementById("mainTable");
+let html="<tr><th>方法</th><th>对象数</th><th>未覆盖</th><th>OA</th><th>椒盐率</th><th>cls_bF1</th><th>seg_bF1</th><th>耗时</th></tr>";
+MAINROW.forEach(([k,t])=>{
+  const r=D.main[k];
+  html+=`<tr><td class="l">${t}</td><td>${r.n_objects}</td><td>${r.uncovered_frac?(r.uncovered_frac*100).toFixed(1)+"%":"—"}</td>`+
+        `<td><b>${r.map_oa.toFixed(4)}</b></td><td>${r.speckle.toFixed(4)}</td><td>${r.cls_boundary_f1.toFixed(4)}</td>`+
+        `<td><b>${r.seg_boundary_f1.toFixed(4)}</b></td><td>${r.seg_seconds.toFixed(1)}s</td></tr>`;
+});
+mt.innerHTML=html;
+document.getElementById("sweepTxt").textContent=
+  "OBIA scale 5→160：对象 925→21，seg_bF1 峰值 0.2508（scale=10）；" +
+  "SAM pps 8→64：对象仅 10→58，seg_bF1 峰 0.3531（pps=32）——pps 是提示密度不是异质性预算。";
+let thState=false;
+function thRender(){
+  const a=D.main["sam_pps32"], b=D.main["sam_pps32_permissive"];
+  const r=thState?b:a;
+  document.getElementById("thTxt").innerHTML=
+    `当前显示 <b>${thState?"放宽阈值（iou≥0.6/stab≥0.85）":"默认阈值（iou≥0.8/stab≥0.95）"}</b>：<br>`+
+    `未覆盖 ${(r.uncovered_frac*100).toFixed(1)}% · 对象 ${r.n_objects} · cls_bF1 <b>${r.cls_boundary_f1.toFixed(3)}</b> · OA <b>${r.map_oa.toFixed(3)}</b>`+
+    (thState?"<br>← 阈值放开：覆盖全了、边界封神（0.95），但大 mask 跨类吞并把 OA 打到 0.82":"<br>← 阈值默认：23% 场景被当'不确定'过滤掉");
+  document.getElementById("thBtn").textContent=thState?"切换：放宽 → 默认":"切换：默认 → 放宽";
+}
+document.getElementById("thBtn").onclick=()=>{thState=!thState;thRender();};thRender();
+
+/* ---------- W4 提示阶梯 ---------- */
+const P=D.prompts, AC=D.auto_containment.iou_mean;
+const ladder=document.getElementById("ladder");
+function bar(cls,label,val,color){
+  return `<div class="lbl">${label}</div><div class="bar ${cls}"><i style="width:${(val*100).toFixed(1)}%"></i><span>${val.toFixed(3)}</span></div>`;
+}
+ladder.innerHTML = bar("a","自动模式（AMG 质心段，反事实基线）",AC,"") + bar("","点提示（质心 1 点）",P.point.iou_mean,"") + bar("o","框提示（图斑 bbox）",P.box.iou_mean,"");
+const rp=document.getElementById("rowPoint"), rb=document.getElementById("rowBox");
+rp.innerHTML += `<td>${P.point.iou_mean.toFixed(3)}</td><td>${P.point.iou_median.toFixed(3)}</td><td>${P.point.coverage_mean.toFixed(3)}</td><td><b>${P.point.spill_mean.toFixed(3)}</b></td><td>${P.point.window_bf1_mean.toFixed(3)}</td><td>${(P.point.seconds_mean*1000).toFixed(0)}ms</td>`;
+rb.innerHTML += `<td>${P.box.iou_mean.toFixed(3)}</td><td>${P.box.iou_median.toFixed(3)}</td><td>${P.box.coverage_mean.toFixed(3)}</td><td><b>${P.box.spill_mean.toFixed(3)}</b></td><td>${P.box.window_bf1_mean.toFixed(3)}</td><td>${(P.box.seconds_mean*1000).toFixed(0)}ms</td>`;
+
+/* ---------- 进度打卡 ---------- */
+const KEY="sam-vs-obia.tutorial.done.v1";
+const secs=[...document.querySelectorAll("input[data-sec]")];
+const chip=document.getElementById("doneChip");
+function loadDone(){ try{return JSON.parse(localStorage.getItem(KEY)||"{}")}catch(e){return{}} }
+function saveDone(d){ try{localStorage.setItem(KEY,JSON.stringify(d))}catch(e){} }
+function refresh(){
+  const d=loadDone(); let n=0;
+  secs.forEach(cb=>{cb.checked=!!d[cb.dataset.sec]; if(cb.checked)n++;});
+  chip.textContent=`已完成 ${n} / ${secs.length} 节`;
+  document.querySelectorAll("nav a").forEach(a=>{
+    a.classList.toggle("cur", !!d[a.getAttribute("href").slice(1)]);
+  });
+}
+secs.forEach(cb=>cb.onchange=()=>{const d=loadDone();d[cb.dataset.sec]=cb.checked;saveDone(d);refresh();});
+refresh();
+/* 复制按钮 */
+document.querySelectorAll("pre").forEach(pre=>{
+  const b=document.createElement("button");b.className="copy";b.textContent="复制";
+  b.onclick=()=>{
+    const t=pre.querySelector("code").innerText;
+    if(navigator.clipboard&&location.protocol!=="file:"){navigator.clipboard.writeText(t);}
+    else{const ta=document.createElement("textarea");ta.value=t;document.body.appendChild(ta);ta.select();document.execCommand("copy");ta.remove();}
+    b.textContent="已复制";setTimeout(()=>b.textContent="复制",1200);
+  };
+  pre.appendChild(b);
+});
+</script>
+</body>
+</html>

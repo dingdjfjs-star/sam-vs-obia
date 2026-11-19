@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>sam-vs-obia · 当 Meta 的 SAM 遇上手写 OBIA</title>
+<style>
+  :root{--ink:#1c2330;--sub:#5b6472;--line:#e3e7ee;--accent:#1976d2}
+  *{box-sizing:border-box}
+  body{margin:0;font-family:"Microsoft YaHei","PingFang SC",system-ui,sans-serif;color:var(--ink);line-height:1.75;background:#fff}
+  .wrap{max-width:1000px;margin:0 auto;padding:34px 24px 80px}
+  h1{font-size:26px;margin:0 0 6px}
+  .tagline{color:var(--sub);font-size:15px;margin-bottom:22px}
+  .hero{display:flex;gap:14px;flex-wrap:wrap;margin:18px 0 26px}
+  .kpi{flex:1;min-width:150px;border:1px solid var(--line);border-radius:12px;padding:14px 16px;background:#fbfcfe}
+  .kpi b{display:block;font-size:24px;color:var(--accent)}
+  .kpi span{font-size:12.5px;color:var(--sub)}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:20px 0}
+  .card{border:1px solid var(--line);border-radius:12px;padding:16px;text-decoration:none;color:inherit;display:block;background:#fff;transition:box-shadow .15s}
+  .card:hover{box-shadow:0 4px 14px rgba(25,118,210,.12)}
+  .card b{color:var(--accent)}
+  .card p{margin:6px 0 0;font-size:13px;color:var(--sub)}
+  img.fig{width:100%;border:1px solid var(--line);border-radius:10px;margin:8px 0}
+  table{border-collapse:collapse;width:100%;font-size:13.5px;margin:12px 0}
+  th,td{border:1px solid var(--line);padding:6px 9px;text-align:center}
+  th{background:#f6f8fb}
+  h2{font-size:19px;border-left:4px solid var(--accent);padding-left:10px;margin:34px 0 10px}
+  .foot{margin-top:50px;color:var(--sub);font-size:12.5px;border-top:1px solid var(--line);padding-top:14px}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>sam-vs-obia</h1>
+  <div class="tagline">当 Meta 的 SAM 遇上手写 OBIA：遥感分割的零样本受控对比 · 2026-11-20 实跑 · test 8 断言全绿</div>
+
+  <div class="hero">
+    <div class="kpi"><b>0.9505</b><span>SAM2 放宽阈值 边界 F1 vs 地类（OBIA 0.4812 的 2 倍）</span></div>
+    <div class="kpi"><b>24×</b><span>分割提速（GPU 3.2s vs CPU 77.9s，512²）</span></div>
+    <div class="kpi"><b>0.9588</b><span>OBIA 全图 OA（SAM 默认档 0.9240）</span></div>
+    <div class="kpi"><b>+0.49</b><span>框提示的图斑 IoU 增益（0.376→0.870，14ms/次）</span></div>
+  </div>
+
+  <h2>一句话结论</h2>
+  <p>SAM2 零样本分割<b>赢在边界与速度</b>（自然图像预训练的边缘先验把"图斑壕沟"切得极准），<b>输在开箱即用的分类精度与尺度可控性</b>（AMG 大 mask 跨类合并、无"对象≈图斑"的尺度语义、默认阈值把 23.2% 的场景切成无人区）。遥感零样本工作流里提示工程是"从不可用到可用"的开关：<b>一次点击不够，一个框刚好</b>。</p>
+
+  <div class="cards">
+    <a class="card" href="tutorial/index.html"><b>▶ 交互教程</b><p>边界 F 计算器 / AMG 涂写演示 / 提示阶梯——真数据可玩，file:// 直开</p></a>
+    <a class="card" href="README.md"><b>📄 对比报告</b><p>实验设计 · 主结果表 · SAM 赢/输条件 · 提示工程价值 · 诚实声明</p></a>
+    <a class="card" href="TUTORIAL.md"><b>📘 精讲教程</b><p>设计逻辑 · 核心代码逐段精讲 · 从零复刻路线 · 面试话术与追问 QA</p></a>
+    <a class="card" href="https://github.com/dingdjfjs-star/sam-vs-obia"><b>⭐ 仓库</b><p>scripts/ · results/summary.json + raw jsonl 溯源账本 · test/test.py</p></a>
+  </div>
+
+  <h2>结果图速览</h2>
+  <img class="fig" src="results/figs/fig1_segmentation_compare.png" alt="fig1">
+  <img class="fig" src="results/figs/fig3_scale_response.png" alt="fig3">
+  <img class="fig" src="results/figs/fig5_prompts.png" alt="fig5">
+
+  <h2>主结果（同一协议同卷）</h2>
+  <table>
+    <tr><th>方法</th><th>对象数</th><th>OA</th><th>椒盐率</th><th>边界F vs 地类</th><th>边界F vs 图斑</th><th>耗时</th></tr>
+    <tr><td>手写 OBIA (scale=10)</td><td>440</td><td><b>0.9588</b></td><td>0.0018</td><td>0.4812</td><td>0.2508</td><td>77.9s CPU</td></tr>
+    <tr><td>SLIC (n=440)</td><td>441</td><td>0.9452</td><td>0.0002</td><td>0.2851</td><td>0.2021</td><td>0.2s CPU</td></tr>
+    <tr><td>SAM2 默认 AMG (pps=32)</td><td>28</td><td>0.9240</td><td>0.0005</td><td>0.6241</td><td>0.3531</td><td><b>3.2s GPU</b></td></tr>
+    <tr><td>SAM2 放宽阈值</td><td>47</td><td>0.8230</td><td>0.0005</td><td><b>0.9505</b></td><td><b>0.4853</b></td><td>3.6s GPU</td></tr>
+  </table>
+  <p class="foot" style="margin-top:10px;color:var(--sub);font-size:12.5px">
+    公平性：SAM mask 涂写为非重叠 label 图后，走与 SLIC 基线完全相同的"19 维特征 → 同种子 RF → 回填"下游协议；
+    指标代码经 sys.path 桥接自 obia-segmentation（零拷贝，测试断言同一函数对象）。
+    场景 seed=20260829 · SAM 输入仅真彩色 RGB（无 NIR）· 全部数字见 results/summary.json（可 1e-9 复算）。
+  </p>
+
+  <h2>什么条件选谁</h2>
+  <table>
+    <tr><th>场景</th><th>推荐</th><th>依据</th></tr>
+    <tr><td>矢量图斑 + 可解释特征 + 高 OA 自动分类（调查/变化检测入库）</td><td><b>OBIA</b></td><td>OA 0.959，NDVI/纹理/形状可解释，产物直接入库</td></tr>
+    <tr><td>贴边界的快速勾绘、样本预标注</td><td><b>SAM2</b></td><td>边界 F 高 1.4~2 倍、快 24 倍、零样本免调参</td></tr>
+    <tr><td>小样本/无标注新区域冷启动</td><td>SAM2 + 框提示</td><td>框提示 IoU 0.87 零训练；OBIA 的 RF 仍需标注样本</td></tr>
+    <tr><td>对象粒度可控（对象≈图斑）</td><td><b>OBIA</b></td><td>scale = 异质性预算；AMG 的 pps 不是尺度</td></tr>
+    <tr><td>CPU-only / 全图 100% 覆盖硬约束</td><td>OBIA</td><td>SAM 需 GPU；默认阈值漏 23%</td></tr>
+  </table>
+
+  <div class="foot">
+    姊妹项目：<a href="https://github.com/dingdjfjs-star/obia-segmentation">obia-segmentation</a>（手写 OBIA 全流程，eCognition 思路复现）·
+    工具链：segment-geospatial 1.4.2 / sam2 (PyPI) / torch 2.6.0+cu124 · 权重 sha256 与 HuggingFace facebook/sam2-hiera-small 逐字节一致（ModelScope 镜像）
+  </div>
+</div>
+</body>
+</html>

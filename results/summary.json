@@ -1,0 +1,1279 @@
+{
+ "meta": {
+  "generated_at": "2026-11-20T01:35:50",
+  "seed": 20260829,
+  "scene_size": 512,
+  "n_parcels_truth": 70,
+  "n_classes": 5,
+  "tol_px": 2,
+  "sam_model_id": "facebook/sam2-hiera-small",
+  "python": "3.11.18",
+  "platform": "Windows-10-10.0.26200-SP0",
+  "device": "cuda:NVIDIA GeForce RTX 4060 Laptop GPU",
+  "torch": "2.6.0+cu124",
+  "samgeo": "1.4.2",
+  "numpy": "2.4.6",
+  "scipy": "1.17.1",
+  "sklearn": "1.9.1",
+  "skimage": "0.26.0"
+ },
+ "main_comparison": {
+  "obia_scale10": {
+   "name": "obia_scale10",
+   "n_objects": 440,
+   "uncovered_frac": 0.0,
+   "map_oa": 0.9587554931640625,
+   "obj_oa": 0.9886363636363636,
+   "speckle": 0.0018157958984375,
+   "cls_boundary_p": 0.4119860252620263,
+   "cls_boundary_r": 0.5783269961977187,
+   "cls_boundary_f1": 0.4811865244668202,
+   "seg_boundary_p": 0.17466347732282725,
+   "seg_boundary_r": 0.4448493683187561,
+   "seg_boundary_f1": 0.25083882635218024,
+   "classify_seconds": 0.5855717658996582,
+   "seg_seconds": 77.87778306007385,
+   "mrs_n_merges": 261704,
+   "mrs_internal_seconds": 77.85302495956421
+  },
+  "slic_440": {
+   "name": "slic_440",
+   "n_objects": 441,
+   "uncovered_frac": 0.0,
+   "map_oa": 0.9451904296875,
+   "obj_oa": 0.9886621315192744,
+   "speckle": 0.00023651123046875,
+   "cls_boundary_p": 0.25521885521885523,
+   "cls_boundary_r": 0.3228136882129278,
+   "cls_boundary_f1": 0.28506401894101313,
+   "seg_boundary_p": 0.13984168865435356,
+   "seg_boundary_r": 0.36431000971817296,
+   "seg_boundary_f1": 0.20210475187184068,
+   "classify_seconds": 0.5712175369262695,
+   "seg_seconds": 0.22688794136047363
+  },
+  "sam_pps32": {
+   "name": "sam_pps32",
+   "n_objects": 28,
+   "uncovered_frac": 0.23191452026367188,
+   "map_oa": 0.9239730834960938,
+   "obj_oa": 1.0,
+   "speckle": 0.0005035400390625,
+   "cls_boundary_p": 0.603035413153457,
+   "cls_boundary_r": 0.6467680608365018,
+   "cls_boundary_f1": 0.6241365989100037,
+   "seg_boundary_p": 0.4766540472327384,
+   "seg_boundary_r": 0.28036929057337223,
+   "seg_boundary_f1": 0.3530648274566069,
+   "classify_seconds": 0.5350954532623291,
+   "seg_seconds": 3.1728017330169678,
+   "n_masks_raw": 75,
+   "n_painted": 28,
+   "pps": 32,
+   "model": "SAM2.0-hiera-small(PyPI sam2 / ModelScope 权重)"
+  },
+  "sam_pps32_permissive": {
+   "name": "sam_pps32_permissive",
+   "n_objects": 47,
+   "uncovered_frac": 0.01371002197265625,
+   "map_oa": 0.8230247497558594,
+   "obj_oa": 0.8936170212765957,
+   "speckle": 0.00052642822265625,
+   "cls_boundary_p": 0.9311429570080392,
+   "cls_boundary_r": 0.970722433460076,
+   "cls_boundary_f1": 0.950520853532729,
+   "seg_boundary_p": 0.7534892493398717,
+   "seg_boundary_r": 0.35787172011661805,
+   "seg_boundary_f1": 0.4852653659098944,
+   "classify_seconds": 0.6263883113861084,
+   "seg_seconds": 3.6388423442840576,
+   "n_masks_raw": 154,
+   "n_painted": 47,
+   "pps": 32,
+   "model": "SAM2.0-hiera-small(PyPI sam2 / ModelScope 权重)",
+   "note": "pred_iou=0.6 stability=0.85 (permissive)"
+  }
+ },
+ "obia_scale_sweep": [
+  {
+   "name": "obia_scale5",
+   "n_objects": 925,
+   "uncovered_frac": 0.0,
+   "map_oa": 0.9712486267089844,
+   "obj_oa": 0.9881081081081081,
+   "speckle": 0.001766204833984375,
+   "cls_boundary_p": 0.5030268088786394,
+   "cls_boundary_r": 0.6585551330798479,
+   "cls_boundary_f1": 0.570378851629294,
+   "seg_boundary_p": 0.16007287870900572,
+   "seg_boundary_r": 0.5589164237123421,
+   "seg_boundary_f1": 0.24886979708898813,
+   "classify_seconds": 0.6169579029083252,
+   "seg_seconds": 75.75649762153625,
+   "mrs_n_merges": 261219,
+   "mrs_internal_seconds": 75.71902132034302,
+   "scale": 5
+  },
+  {
+   "name": "obia_scale10",
+   "n_objects": 440,
+   "uncovered_frac": 0.0,
+   "map_oa": 0.9587554931640625,
+   "obj_oa": 0.9886363636363636,
+   "speckle": 0.0018157958984375,
+   "cls_boundary_p": 0.4119860252620263,
+   "cls_boundary_r": 0.5783269961977187,
+   "cls_boundary_f1": 0.4811865244668202,
+   "seg_boundary_p": 0.17466347732282725,
+   "seg_boundary_r": 0.4448493683187561,
+   "seg_boundary_f1": 0.25083882635218024,
+   "classify_seconds": 0.5855717658996582,
+   "seg_seconds": 77.87778306007385,
+   "mrs_n_merges": 261704,
+   "mrs_internal_seconds": 77.85302495956421,
+   "scale": 10
+  },
+  {
+   "name": "obia_scale20",
+   "n_objects": 191,
+   "uncovered_frac": 0.0,
+   "map_oa": 0.9387588500976562,
+   "obj_oa": 0.9842931937172775,
+   "speckle": 0.001956939697265625,
+   "cls_boundary_p": 0.3386464593676509,
+   "cls_boundary_r": 0.48897338403041823,
+   "cls_boundary_f1": 0.40015740692499235,
+   "seg_boundary_p": 0.1921910818605339,
+   "seg_boundary_r": 0.31669096209912534,
+   "seg_boundary_f1": 0.23921134315405013,
+   "classify_seconds": 0.5231723785400391,
+   "seg_seconds": 77.38728260993958,
+   "mrs_n_merges": 261953,
+   "mrs_internal_seconds": 77.3686261177063,
+   "scale": 20
+  },
+  {
+   "name": "obia_scale40",
+   "n_objects": 93,
+   "uncovered_frac": 0.0,
+   "map_oa": 0.9103813171386719,
+   "obj_oa": 0.978494623655914,
+   "speckle": 0.001743316650390625,
+   "cls_boundary_p": 0.2936021034180543,
+   "cls_boundary_r": 0.3836501901140684,
+   "cls_boundary_f1": 0.332639708628419,
+   "seg_boundary_p": 0.20250477605603906,
+   "seg_boundary_r": 0.23760932944606414,
+   "seg_boundary_f1": 0.21865704119347243,
+   "classify_seconds": 0.5111689567565918,
+   "seg_seconds": 76.93820524215698,
+   "mrs_n_merges": 262051,
+   "mrs_internal_seconds": 76.91909551620483,
+   "scale": 40
+  },
+  {
+   "name": "obia_scale80",
+   "n_objects": 43,
+   "uncovered_frac": 0.0,
+   "map_oa": 0.9068374633789062,
+   "obj_oa": 0.9534883720930233,
+   "speckle": 0.001491546630859375,
+   "cls_boundary_p": 0.2937204591492235,
+   "cls_boundary_r": 0.3311787072243346,
+   "cls_boundary_f1": 0.3113269057818793,
+   "seg_boundary_p": 0.24128641185384744,
+   "seg_boundary_r": 0.17674927113702624,
+   "seg_boundary_f1": 0.2040361584700745,
+   "classify_seconds": 0.5110797882080078,
+   "seg_seconds": 75.08845233917236,
+   "mrs_n_merges": 262101,
+   "mrs_internal_seconds": 75.07341694831848,
+   "scale": 80
+  },
+  {
+   "name": "obia_scale160",
+   "n_objects": 21,
+   "uncovered_frac": 0.0,
+   "map_oa": 0.8071098327636719,
+   "obj_oa": 0.9047619047619048,
+   "speckle": 0.00145721435546875,
+   "cls_boundary_p": 0.27108843537414967,
+   "cls_boundary_r": 0.3015209125475285,
+   "cls_boundary_f1": 0.2854959763118488,
+   "seg_boundary_p": 0.2590660705414804,
+   "seg_boundary_r": 0.12791545189504372,
+   "seg_boundary_f1": 0.17126685158164057,
+   "classify_seconds": 0.5311446189880371,
+   "seg_seconds": 75.63644433021545,
+   "mrs_n_merges": 262123,
+   "mrs_internal_seconds": 75.62364888191223,
+   "scale": 160
+  }
+ ],
+ "sam_pps_sweep": [
+  {
+   "name": "sam_pps8",
+   "n_objects": 10,
+   "uncovered_frac": 0.2859611511230469,
+   "map_oa": 0.85980224609375,
+   "obj_oa": 0.9,
+   "speckle": 4.57763671875e-05,
+   "cls_boundary_p": 0.5807814149947201,
+   "cls_boundary_r": 0.4231939163498099,
+   "cls_boundary_f1": 0.48961992168800694,
+   "seg_boundary_p": 0.5357698289269052,
+   "seg_boundary_r": 0.17225461613216717,
+   "seg_boundary_f1": 0.2606938979608282,
+   "classify_seconds": 0.5647406578063965,
+   "seg_seconds": 1.1295816898345947,
+   "n_masks_raw": 10,
+   "n_painted": 10,
+   "pps": 8,
+   "model": "SAM2.0-hiera-small(PyPI sam2 / ModelScope 权重)"
+  },
+  {
+   "name": "sam_pps16",
+   "n_objects": 15,
+   "uncovered_frac": 0.23610687255859375,
+   "map_oa": 0.8912582397460938,
+   "obj_oa": 0.9333333333333333,
+   "speckle": 0.00029754638671875,
+   "cls_boundary_p": 0.5947812739831159,
+   "cls_boundary_r": 0.5844106463878327,
+   "cls_boundary_f1": 0.5895503569571693,
+   "seg_boundary_p": 0.5724572457245725,
+   "seg_boundary_r": 0.23214285714285715,
+   "seg_boundary_f1": 0.3303302103517849,
+   "classify_seconds": 0.5404210090637207,
+   "seg_seconds": 1.0213146209716797,
+   "n_masks_raw": 25,
+   "n_painted": 15,
+   "pps": 16,
+   "model": "SAM2.0-hiera-small(PyPI sam2 / ModelScope 权重)"
+  },
+  {
+   "name": "sam_pps32",
+   "n_objects": 28,
+   "uncovered_frac": 0.23191452026367188,
+   "map_oa": 0.9239730834960938,
+   "obj_oa": 1.0,
+   "speckle": 0.0005035400390625,
+   "cls_boundary_p": 0.603035413153457,
+   "cls_boundary_r": 0.6467680608365018,
+   "cls_boundary_f1": 0.6241365989100037,
+   "seg_boundary_p": 0.4766540472327384,
+   "seg_boundary_r": 0.28036929057337223,
+   "seg_boundary_f1": 0.3530648274566069,
+   "classify_seconds": 0.5350954532623291,
+   "seg_seconds": 3.1728017330169678,
+   "n_masks_raw": 75,
+   "n_painted": 28,
+   "pps": 32,
+   "model": "SAM2.0-hiera-small(PyPI sam2 / ModelScope 权重)"
+  },
+  {
+   "name": "sam_pps48",
+   "n_objects": 44,
+   "uncovered_frac": 0.22702789306640625,
+   "map_oa": 0.9179267883300781,
+   "obj_oa": 0.9545454545454546,
+   "speckle": 0.00078582763671875,
+   "cls_boundary_p": 0.4641350210970464,
+   "cls_boundary_r": 0.6102661596958175,
+   "cls_boundary_f1": 0.5272628175933461,
+   "seg_boundary_p": 0.4032963336696939,
+   "seg_boundary_r": 0.25704567541302237,
+   "seg_boundary_f1": 0.3139754159324934,
+   "classify_seconds": 0.5646743774414062,
+   "seg_seconds": 7.137394189834595,
+   "n_masks_raw": 146,
+   "n_painted": 44,
+   "pps": 48,
+   "model": "SAM2.0-hiera-small(PyPI sam2 / ModelScope 权重)"
+  },
+  {
+   "name": "sam_pps64",
+   "n_objects": 58,
+   "uncovered_frac": 0.2226715087890625,
+   "map_oa": 0.9350242614746094,
+   "obj_oa": 0.9310344827586207,
+   "speckle": 0.001277923583984375,
+   "cls_boundary_p": 0.49448576558091817,
+   "cls_boundary_r": 0.6608365019011407,
+   "cls_boundary_f1": 0.5656850088739002,
+   "seg_boundary_p": 0.39788997739261495,
+   "seg_boundary_r": 0.27684645286686105,
+   "seg_boundary_f1": 0.32651098690509445,
+   "classify_seconds": 0.5976016521453857,
+   "seg_seconds": 12.511076211929321,
+   "n_masks_raw": 201,
+   "n_painted": 58,
+   "pps": 64,
+   "model": "SAM2.0-hiera-small(PyPI sam2 / ModelScope 权重)"
+  }
+ ],
+ "prompts": {
+  "summary": {
+   "name": "sam_prompts_summary",
+   "point": {
+    "n": 18,
+    "iou_mean": 0.6020847720272836,
+    "iou_median": 0.5121571292538699,
+    "coverage_mean": 0.9206459412137207,
+    "spill_mean": 0.3238558690783502,
+    "window_bf1_mean": 0.5640277618752171,
+    "seconds_mean": 0.015937103165520564,
+    "iou_per_class": {
+     "1": 0.8552476901231311,
+     "2": 0.6385550520638918,
+     "3": 0.9603980091073898,
+     "4": 0.4741334908449757,
+     "5": 0.2612462365370826
+    }
+   },
+   "box": {
+    "n": 18,
+    "iou_mean": 0.8697597607448508,
+    "iou_median": 0.9421456018122378,
+    "coverage_mean": 0.9535532134380096,
+    "spill_mean": 0.08948451415216944,
+    "window_bf1_mean": 0.7444872922677624,
+    "seconds_mean": 0.014053887791103788,
+    "iou_per_class": {
+     "1": 0.980760237075706,
+     "2": 0.8323349775537073,
+     "3": 0.9784748777139392,
+     "4": 0.9332540760370867,
+     "5": 0.6783321938283592
+    }
+   }
+  },
+  "records": [
+   {
+    "parcel_id": 6,
+    "class": 1,
+    "area": 4957,
+    "mode": "point",
+    "seconds": 0.013471364974975586,
+    "iou": 0.9073207264557199,
+    "coverage": 0.9776074238450676,
+    "spill": 0.0734225621414914,
+    "window_bf1": 0.6707080090622126,
+    "point_xy": [
+     349,
+     193
+    ],
+    "bbox": null,
+    "window": [
+     126,
+     291,
+     265,
+     419
+    ]
+   },
+   {
+    "parcel_id": 6,
+    "class": 1,
+    "area": 4957,
+    "mode": "box",
+    "seconds": 0.03154397010803223,
+    "iou": 0.9731839103462078,
+    "coverage": 0.9810369174904175,
+    "spill": 0.008158270446665308,
+    "window_bf1": 0.9982608695652174,
+    "point_xy": null,
+    "bbox": [
+     315,
+     150,
+     394,
+     240
+    ],
+    "window": [
+     126,
+     291,
+     265,
+     419
+    ]
+   },
+   {
+    "parcel_id": 30,
+    "class": 1,
+    "area": 6961,
+    "mode": "point",
+    "seconds": 0.01427602767944336,
+    "iou": 0.9880764258008907,
+    "coverage": 0.9880764258008907,
+    "spill": 0.0,
+    "window_bf1": 1.0,
+    "point_xy": [
+     250,
+     460
+    ],
+    "bbox": null,
+    "window": [
+     381,
+     181,
+     512,
+     314
+    ]
+   },
+   {
+    "parcel_id": 30,
+    "class": 1,
+    "area": 6961,
+    "mode": "box",
+    "seconds": 0.012987136840820312,
+    "iou": 0.991238149956909,
+    "coverage": 0.9913805487717282,
+    "spill": 0.0001448855404230658,
+    "window_bf1": 1.0,
+    "point_xy": null,
+    "bbox": [
+     205,
+     405,
+     289,
+     511
+    ],
+    "window": [
+     381,
+     181,
+     512,
+     314
+    ]
+   },
+   {
+    "parcel_id": 17,
+    "class": 1,
+    "area": 4366,
+    "mode": "point",
+    "seconds": 0.011981964111328125,
+    "iou": 0.5389027431421446,
+    "coverage": 0.9899221255153459,
+    "spill": 0.45812437311935805,
+    "window_bf1": 0.7432826378736974,
+    "point_xy": [
+     371,
+     247
+    ],
+    "bbox": null,
+    "window": [
+     185,
+     300,
+     312,
+     445
+    ]
+   },
+   {
+    "parcel_id": 17,
+    "class": 1,
+    "area": 4366,
+    "mode": "box",
+    "seconds": 0.013650178909301758,
+    "iou": 0.9682865617157198,
+    "coverage": 0.9720568025652772,
+    "spill": 0.003989673785496362,
+    "window_bf1": 1.0,
+    "point_xy": null,
+    "bbox": [
+     324,
+     209,
+     420,
+     287
+    ],
+    "window": [
+     185,
+     300,
+     312,
+     445
+    ]
+   },
+   {
+    "parcel_id": 55,
+    "class": 1,
+    "area": 1650,
+    "mode": "point",
+    "seconds": 0.014753103256225586,
+    "iou": 0.9866908650937689,
+    "coverage": 0.9884848484848485,
+    "spill": 0.0018359853121175031,
+    "window_bf1": 1.0,
+    "point_xy": [
+     344,
+     497
+    ],
+    "bbox": null,
+    "window": [
+     450,
+     277,
+     512,
+     398
+    ]
+   },
+   {
+    "parcel_id": 55,
+    "class": 1,
+    "area": 1650,
+    "mode": "box",
+    "seconds": 0.012733936309814453,
+    "iou": 0.9903323262839879,
+    "coverage": 0.9933333333333333,
+    "spill": 0.0030413625304136255,
+    "window_bf1": 1.0,
+    "point_xy": null,
+    "bbox": [
+     301,
+     474,
+     373,
+     511
+    ],
+    "window": [
+     450,
+     277,
+     512,
+     398
+    ]
+   },
+   {
+    "parcel_id": 19,
+    "class": 2,
+    "area": 3886,
+    "mode": "point",
+    "seconds": 0.01223444938659668,
+    "iou": 0.9706182933060807,
+    "coverage": 0.9776119402985075,
+    "spill": 0.0073164358505356675,
+    "window_bf1": 0.9857651245551602,
+    "point_xy": [
+     342,
+     109
+    ],
+    "bbox": null,
+    "window": [
+     39,
+     286,
+     179,
+     399
+    ]
+   },
+   {
+    "parcel_id": 19,
+    "class": 2,
+    "area": 3886,
+    "mode": "box",
+    "seconds": 0.013905525207519531,
+    "iou": 0.9750127485976543,
+    "coverage": 0.9840452907874421,
+    "spill": 0.00932642487046632,
+    "window_bf1": 0.9858403030225996,
+    "point_xy": null,
+    "bbox": [
+     310,
+     63,
+     374,
+     154
+    ],
+    "window": [
+     39,
+     286,
+     179,
+     399
+    ]
+   },
+   {
+    "parcel_id": 69,
+    "class": 2,
+    "area": 2480,
+    "mode": "point",
+    "seconds": 0.010497570037841797,
+    "iou": 0.22752208275220828,
+    "coverage": 0.9866935483870968,
+    "spill": 0.7717776534228689,
+    "window_bf1": 0.2990000970779536,
+    "point_xy": [
+     278,
+     336
+    ],
+    "bbox": null,
+    "window": [
+     275,
+     225,
+     404,
+     342
+    ]
+   },
+   {
+    "parcel_id": 69,
+    "class": 2,
+    "area": 2480,
+    "mode": "box",
+    "seconds": 0.009650468826293945,
+    "iou": 0.5961145194274029,
+    "coverage": 0.9403225806451613,
+    "spill": 0.3804463336875664,
+    "window_bf1": 0.3092741358516793,
+    "point_xy": null,
+    "bbox": [
+     249,
+     299,
+     317,
+     379
+    ],
+    "window": [
+     275,
+     225,
+     404,
+     342
+    ]
+   },
+   {
+    "parcel_id": 36,
+    "class": 2,
+    "area": 6911,
+    "mode": "point",
+    "seconds": 0.01082921028137207,
+    "iou": 0.4854115153655952,
+    "coverage": 0.9942121255968746,
+    "spill": 0.5132128940843075,
+    "window_bf1": 0.6607407407407407,
+    "point_xy": [
+     228,
+     339
+    ],
+    "bbox": null,
+    "window": [
+     252,
+     162,
+     432,
+     292
+    ]
+   },
+   {
+    "parcel_id": 36,
+    "class": 2,
+    "area": 6911,
+    "mode": "box",
+    "seconds": 0.011160135269165039,
+    "iou": 0.8621730382293763,
+    "coverage": 0.8680364636087397,
+    "spill": 0.007773734700628514,
+    "window_bf1": 0.5826497215964637,
+    "point_xy": null,
+    "bbox": [
+     186,
+     276,
+     267,
+     407
+    ],
+    "window": [
+     252,
+     162,
+     432,
+     292
+    ]
+   },
+   {
+    "parcel_id": 31,
+    "class": 2,
+    "area": 4845,
+    "mode": "point",
+    "seconds": 0.013513803482055664,
+    "iou": 0.8706683168316832,
+    "coverage": 0.8712074303405573,
+    "spill": 0.0007102272727272727,
+    "window_bf1": 0.6123988748119235,
+    "point_xy": [
+     482,
+     122
+    ],
+    "bbox": null,
+    "window": [
+     45,
+     420,
+     187,
+     512
+    ]
+   },
+   {
+    "parcel_id": 31,
+    "class": 2,
+    "area": 4845,
+    "mode": "box",
+    "seconds": 0.011017799377441406,
+    "iou": 0.8960396039603961,
+    "coverage": 0.896594427244582,
+    "spill": 0.0006901311249137336,
+    "window_bf1": 0.6214069425549654,
+    "point_xy": null,
+    "bbox": [
+     444,
+     69,
+     511,
+     162
+    ],
+    "window": [
+     45,
+     420,
+     187,
+     512
+    ]
+   },
+   {
+    "parcel_id": 66,
+    "class": 3,
+    "area": 4478,
+    "mode": "point",
+    "seconds": 0.010428905487060547,
+    "iou": 0.9734611953612846,
+    "coverage": 0.9747655203215722,
+    "spill": 0.0013726835964310226,
+    "window_bf1": 0.9818015872132498,
+    "point_xy": [
+     373,
+     360
+    ],
+    "bbox": null,
+    "window": [
+     287,
+     317,
+     434,
+     432
+    ]
+   },
+   {
+    "parcel_id": 66,
+    "class": 3,
+    "area": 4478,
+    "mode": "box",
+    "seconds": 0.01203155517578125,
+    "iou": 0.9843819723337796,
+    "coverage": 0.9852612773559625,
+    "spill": 0.0009057971014492754,
+    "window_bf1": 0.9983416252072967,
+    "point_xy": null,
+    "bbox": [
+     341,
+     311,
+     407,
+     409
+    ],
+    "window": [
+     287,
+     317,
+     434,
+     432
+    ]
+   },
+   {
+    "parcel_id": 48,
+    "class": 3,
+    "area": 3131,
+    "mode": "point",
+    "seconds": 0.04130864143371582,
+    "iou": 0.947334822853495,
+    "coverage": 0.9479399552858512,
+    "spill": 0.0006734006734006734,
+    "window_bf1": 0.9041666666666667,
+    "point_xy": [
+     430,
+     351
+    ],
+    "bbox": null,
+    "window": [
+     292,
+     374,
+     409,
+     488
+    ]
+   },
+   {
+    "parcel_id": 48,
+    "class": 3,
+    "area": 3131,
+    "mode": "box",
+    "seconds": 0.012318849563598633,
+    "iou": 0.9725677830940989,
+    "coverage": 0.9738102842542319,
+    "spill": 0.0013101867016049786,
+    "window_bf1": 0.9410523539496243,
+    "point_xy": null,
+    "bbox": [
+     398,
+     316,
+     463,
+     384
+    ],
+    "window": [
+     292,
+     374,
+     409,
+     488
+    ]
+   },
+   {
+    "parcel_id": 70,
+    "class": 4,
+    "area": 2909,
+    "mode": "point",
+    "seconds": 0.01203012466430664,
+    "iou": 0.3250251480943333,
+    "coverage": 0.9996562392574768,
+    "spill": 0.6749385200089425,
+    "window_bf1": 0.030864197530864196,
+    "point_xy": [
+     28,
+     314
+    ],
+    "bbox": null,
+    "window": [
+     256,
+     0,
+     365,
+     95
+    ]
+   },
+   {
+    "parcel_id": 70,
+    "class": 4,
+    "area": 2909,
+    "mode": "box",
+    "seconds": 0.014371156692504883,
+    "iou": 0.9286197564276049,
+    "coverage": 0.9436232382261945,
+    "spill": 0.01683381088825215,
+    "window_bf1": 0.8481595502610092,
+    "point_xy": null,
+    "bbox": [
+     0,
+     280,
+     70,
+     340
+    ],
+    "window": [
+     256,
+     0,
+     365,
+     95
+    ]
+   },
+   {
+    "parcel_id": 26,
+    "class": 4,
+    "area": 4547,
+    "mode": "point",
+    "seconds": 0.017124176025390625,
+    "iou": 0.3080516625446551,
+    "coverage": 0.9861447107983285,
+    "spill": 0.6906092596425861,
+    "window_bf1": 0.5474644549763035,
+    "point_xy": [
+     185,
+     375
+    ],
+    "bbox": null,
+    "window": [
+     298,
+     107,
+     444,
+     257
+    ]
+   },
+   {
+    "parcel_id": 26,
+    "class": 4,
+    "area": 4547,
+    "mode": "box",
+    "seconds": 0.010451793670654297,
+    "iou": 0.8905534748231377,
+    "coverage": 0.941279964811964,
+    "spill": 0.057061026657854154,
+    "window_bf1": 0.7484043122688825,
+    "point_xy": null,
+    "bbox": [
+     131,
+     322,
+     232,
+     419
+    ],
+    "window": [
+     298,
+     107,
+     444,
+     257
+    ]
+   },
+   {
+    "parcel_id": 35,
+    "class": 4,
+    "area": 4530,
+    "mode": "point",
+    "seconds": 0.01951885223388672,
+    "iou": 0.3283202557396106,
+    "coverage": 0.9975717439293599,
+    "spill": 0.6714171453501054,
+    "window_bf1": 0.09737827715355804,
+    "point_xy": [
+     147,
+     465
+    ],
+    "bbox": null,
+    "window": [
+     409,
+     82,
+     512,
+     230
+    ]
+   },
+   {
+    "parcel_id": 35,
+    "class": 4,
+    "area": 4530,
+    "mode": "box",
+    "seconds": 0.014898300170898438,
+    "iou": 0.9581716257007331,
+    "coverage": 0.9810154525386313,
+    "spill": 0.023725834797891036,
+    "window_bf1": 0.9688151532626536,
+    "point_xy": null,
+    "bbox": [
+     106,
+     433,
+     205,
+     511
+    ],
+    "window": [
+     409,
+     82,
+     512,
+     230
+    ]
+   },
+   {
+    "parcel_id": 54,
+    "class": 4,
+    "area": 3068,
+    "mode": "point",
+    "seconds": 0.01757502555847168,
+    "iou": 0.9351368970013038,
+    "coverage": 0.9351368970013038,
+    "spill": 0.0,
+    "window_bf1": 0.819758562252861,
+    "point_xy": [
+     190,
+     491
+    ],
+    "bbox": null,
+    "window": [
+     427,
+     110,
+     512,
+     257
+    ]
+   },
+   {
+    "parcel_id": 54,
+    "class": 4,
+    "area": 3068,
+    "mode": "box",
+    "seconds": 0.013577461242675781,
+    "iou": 0.9556714471968709,
+    "coverage": 0.9556714471968709,
+    "spill": 0.0,
+    "window_bf1": 0.9513296537882588,
+    "point_xy": null,
+    "bbox": [
+     134,
+     451,
+     232,
+     511
+    ],
+    "window": [
+     427,
+     110,
+     512,
+     257
+    ]
+   },
+   {
+    "parcel_id": 45,
+    "class": 5,
+    "area": 3958,
+    "mode": "point",
+    "seconds": 0.023157119750976562,
+    "iou": 0.381657989587505,
+    "coverage": 0.9631126831733199,
+    "spill": 0.6126803495224548,
+    "window_bf1": 0.24464966055721923,
+    "point_xy": [
+     437,
+     259
+    ],
+    "bbox": null,
+    "window": [
+     195,
+     373,
+     329,
+     497
+    ]
+   },
+   {
+    "parcel_id": 45,
+    "class": 5,
+    "area": 3958,
+    "mode": "box",
+    "seconds": 0.017076730728149414,
+    "iou": 0.8544862854486286,
+    "coverage": 0.9287518948964123,
+    "spill": 0.08557213930348259,
+    "window_bf1": 0.575510133319464,
+    "point_xy": null,
+    "bbox": [
+     397,
+     219,
+     472,
+     304
+    ],
+    "window": [
+     195,
+     373,
+     329,
+     497
+    ]
+   },
+   {
+    "parcel_id": 57,
+    "class": 5,
+    "area": 2696,
+    "mode": "point",
+    "seconds": 0.019505977630615234,
+    "iou": 0.2985308960412695,
+    "coverage": 0.9873887240356083,
+    "spill": 0.700326466283913,
+    "window_bf1": 0.17734470158343482,
+    "point_xy": [
+     39,
+     204
+    ],
+    "bbox": null,
+    "window": [
+     155,
+     0,
+     258,
+     103
+    ]
+   },
+   {
+    "parcel_id": 57,
+    "class": 5,
+    "area": 2696,
+    "mode": "box",
+    "seconds": 0.01690077781677246,
+    "iou": 0.5705376344086022,
+    "coverage": 0.9840504451038575,
+    "spill": 0.4241371825482961,
+    "window_bf1": 0.14042553191489363,
+    "point_xy": null,
+    "bbox": [
+     0,
+     179,
+     78,
+     233
+    ],
+    "window": [
+     155,
+     0,
+     258,
+     103
+    ]
+   },
+   {
+    "parcel_id": 5,
+    "class": 5,
+    "area": 4201,
+    "mode": "point",
+    "seconds": 0.012064456939697266,
+    "iou": 0.01713877648179005,
+    "coverage": 0.01713877648179005,
+    "spill": 0.0,
+    "window_bf1": 0.0,
+    "point_xy": [
+     437,
+     406
+    ],
+    "bbox": null,
+    "window": [
+     348,
+     365,
+     467,
+     508
+    ]
+   },
+   {
+    "parcel_id": 5,
+    "class": 5,
+    "area": 4201,
+    "mode": "box",
+    "seconds": 0.012298822402954102,
+    "iou": 0.7896354852876593,
+    "coverage": 0.8559866698405142,
+    "spill": 0.08938971891618132,
+    "window_bf1": 0.503875968992248,
+    "point_xy": null,
+    "bbox": [
+     389,
+     372,
+     483,
+     442
+    ],
+    "window": [
+     348,
+     365,
+     467,
+     508
+    ]
+   },
+   {
+    "parcel_id": 14,
+    "class": 5,
+    "area": 3984,
+    "mode": "point",
+    "seconds": 0.012597084045410156,
+    "iou": 0.3476572840377658,
+    "coverage": 0.9889558232931727,
+    "spill": 0.6509876871290637,
+    "window_bf1": 0.3771761216980614,
+    "point_xy": [
+     326,
+     414
+    ],
+    "bbox": null,
+    "window": [
+     360,
+     243,
+     468,
+     402
+    ]
+   },
+   {
+    "parcel_id": 14,
+    "class": 5,
+    "area": 3984,
+    "mode": "box",
+    "seconds": 0.012395381927490234,
+    "iou": 0.49866937016854646,
+    "coverage": 0.9877008032128514,
+    "spill": 0.49821474113746494,
+    "window_bf1": 0.22742500526446768,
+    "point_xy": null,
+    "bbox": [
+     267,
+     384,
+     377,
+     443
+    ],
+    "window": [
+     360,
+     243,
+     468,
+     402
+    ]
+   }
+  ]
+ },
+ "auto_containment": {
+  "n": 18,
+  "iou_mean": 0.37632815435310213,
+  "iou_median": 0.35000281889626983,
+  "per_parcel": [
+   {
+    "parcel_id": 6,
+    "area": 4957,
+    "iou": 0.4562074433355097
+   },
+   {
+    "parcel_id": 30,
+    "area": 6961,
+    "iou": 0.7622670636233322
+   },
+   {
+    "parcel_id": 17,
+    "area": 4366,
+    "iou": 0.3921223354958295
+   },
+   {
+    "parcel_id": 55,
+    "area": 1650,
+    "iou": 0.6462984723854289
+   },
+   {
+    "parcel_id": 19,
+    "area": 3886,
+    "iou": 0.7882113821138211
+   },
+   {
+    "parcel_id": 69,
+    "area": 2480,
+    "iou": 0.0729004379905347
+   },
+   {
+    "parcel_id": 36,
+    "area": 6911,
+    "iou": 0.2029036619056016
+   },
+   {
+    "parcel_id": 31,
+    "area": 4845,
+    "iou": 0.6027124548961055
+   },
+   {
+    "parcel_id": 66,
+    "area": 4478,
+    "iou": 0.49510458388963063
+   },
+   {
+    "parcel_id": 48,
+    "area": 3131,
+    "iou": 0.27750247770069375
+   },
+   {
+    "parcel_id": 70,
+    "area": 2909,
+    "iou": 0.06446251689675804
+   },
+   {
+    "parcel_id": 26,
+    "area": 4547,
+    "iou": 0.10068690449811656
+   },
+   {
+    "parcel_id": 35,
+    "area": 4530,
+    "iou": 0.10038336251024885
+   },
+   {
+    "parcel_id": 54,
+    "area": 3068,
+    "iou": 0.9488265971316818
+   },
+   {
+    "parcel_id": 45,
+    "area": 3958,
+    "iou": 0.39649642240315813
+   },
+   {
+    "parcel_id": 57,
+    "area": 2696,
+    "iou": 0.03069249295179829
+   },
+   {
+    "parcel_id": 5,
+    "area": 4201,
+    "iou": 0.3078833022967101
+   },
+   {
+    "parcel_id": 14,
+    "area": 3984,
+    "iou": 0.1282448663308795
+   }
+  ]
+ }
+}

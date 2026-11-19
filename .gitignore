@@ -1,0 +1,9 @@
+# 大体积二进制产物不入库（数字溯源靠 results/raw/*.jsonl + summary.json）
+data/scene.npz
+results/labelmaps/
+results/classmaps/
+results/prompt_windows.npz
+results/logs/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
