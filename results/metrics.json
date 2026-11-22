@@ -1,0 +1,335 @@
+{
+ "generated_at": "2026-11-22T18:13:56",
+ "dataset": {
+  "name": "LoveDA (mrmeepsle/LoveDa parquet via hf-mirror)",
+  "classes": {
+   "0": "ignore",
+   "1": "background",
+   "2": "building",
+   "3": "road",
+   "4": "water",
+   "5": "barren",
+   "6": "forest",
+   "7": "agriculture"
+  },
+  "img_size": 1024,
+  "chip_size": 512,
+  "n_test_chips": 64,
+  "test_img_names": [
+   "test_2541_00",
+   "test_2541_01",
+   "test_2541_10",
+   "test_2541_11",
+   "test_2578_00",
+   "test_2578_01",
+   "test_2578_10",
+   "test_2578_11",
+   "test_2655_00",
+   "test_2655_01",
+   "test_2655_10",
+   "test_2655_11",
+   "test_2663_00",
+   "test_2663_01",
+   "test_2663_10",
+   "test_2663_11",
+   "test_2674_00",
+   "test_2674_01",
+   "test_2674_10",
+   "test_2674_11",
+   "test_2727_00",
+   "test_2727_01",
+   "test_2727_10",
+   "test_2727_11",
+   "test_2731_00",
+   "test_2731_01",
+   "test_2731_10",
+   "test_2731_11",
+   "test_2740_00",
+   "test_2740_01",
+   "test_2740_10",
+   "test_2740_11",
+   "test_2749_00",
+   "test_2749_01",
+   "test_2749_10",
+   "test_2749_11",
+   "test_2771_00",
+   "test_2771_01",
+   "test_2771_10",
+   "test_2771_11",
+   "test_2790_00",
+   "test_2790_01",
+   "test_2790_10",
+   "test_2790_11",
+   "test_2798_00",
+   "test_2798_01",
+   "test_2798_10",
+   "test_2798_11",
+   "test_2805_00",
+   "test_2805_01",
+   "test_2805_10",
+   "test_2805_11",
+   "test_2822_00",
+   "test_2822_01",
+   "test_2822_10",
+   "test_2822_11",
+   "test_2832_00",
+   "test_2832_01",
+   "test_2832_10",
+   "test_2832_11",
+   "test_2852_00",
+   "test_2852_01",
+   "test_2852_10",
+   "test_2852_11"
+  ],
+  "n_train_chips": 3368,
+  "manifest": "data/loveda_split_manifest.json"
+ },
+ "seed": 20260829,
+ "tol_px": 2,
+ "obia": {
+  "main_scale": 10,
+  "shape": 0.2,
+  "compactness": 0.5,
+  "calibration_image": "2522.png",
+  "calibration_rule": "scale ∈ [5, 10, 20, 40, 80] 扫描，对象数 200~800 带内取最小",
+  "calibration_records": [
+   {
+    "scale": 5,
+    "n_objects": 897,
+    "seconds": 77.62751603126526
+   },
+   {
+    "scale": 10,
+    "n_objects": 417,
+    "seconds": 80.71135330200195
+   },
+   {
+    "scale": 20,
+    "n_objects": 220,
+    "seconds": 80.21508574485779
+   },
+   {
+    "scale": 40,
+    "n_objects": 98,
+    "seconds": 80.20281934738159
+   },
+   {
+    "scale": 80,
+    "n_objects": 48,
+    "seconds": 79.83396005630493
+   }
+  ]
+ },
+ "sam2": {
+  "model": "facebook/sam2-hiera-small",
+  "pps": 32,
+  "ckpt_sha256_16": "95949964d4e54840",
+  "configs": [
+   "default",
+   "permissive"
+  ]
+ },
+ "unet": {
+  "arch": "handwritten UNet base32 (scripts/unet.py)",
+  "checkpoint": "results/v2/unet_best.pt",
+  "checkpoint_sha256_16": "532c8dd94aaecae6",
+  "monitor_oa": 0.7487410255889584,
+  "epoch": 25,
+  "train_log": "results/v2/train_log.json"
+ },
+ "torch_cuda": "NVIDIA GeForce RTX 4060 Laptop GPU",
+ "metrics": {
+  "obia": {
+   "n_chips": 64,
+   "map_oa": {
+    "mean": 0.9194903373718262,
+    "std": 0.07297650105947441,
+    "n": 64,
+    "median": 0.9348106384277344
+   },
+   "speckle": {
+    "mean": 0.0016102194786071777,
+    "std": 0.0015354451356134934,
+    "n": 64,
+    "median": 0.001224517822265625
+   },
+   "cls_boundary_f1": {
+    "mean": 0.15450525373874113,
+    "std": 0.10504187240834109,
+    "n": 64,
+    "median": 0.1683947279198388
+   },
+   "cls_boundary_f1_multiclass": {
+    "mean": 0.18311733776443392,
+    "std": 0.08853090797659387,
+    "n": 54
+   },
+   "seg_boundary_f1": {
+    "mean": 0.05717326269596454,
+    "std": 0.05214777738147571,
+    "n": 64,
+    "median": 0.049015927655404676
+   },
+   "seg_seconds": {
+    "mean": 166.2279760763049,
+    "std": 712.804755656951,
+    "n": 64,
+    "median": 75.37206995487213
+   },
+   "n_objects": {
+    "mean": 445.90625,
+    "std": 45.1960032628716,
+    "n": 64
+   },
+   "n_degenerate_chips": 0,
+   "n_single_class_chips": 10
+  },
+  "sam_default": {
+   "n_chips": 64,
+   "map_oa": {
+    "mean": 0.7189611792564392,
+    "std": 0.2936717879368503,
+    "n": 64,
+    "median": 0.8113231658935547
+   },
+   "speckle": {
+    "mean": 1.4901161193847656e-06,
+    "std": 4.937841023930179e-06,
+    "n": 64,
+    "median": 0.0
+   },
+   "cls_boundary_f1": {
+    "mean": 0.002410583046819359,
+    "std": 0.007927066000019198,
+    "n": 64,
+    "median": 0.0
+   },
+   "cls_boundary_f1_multiclass": {
+    "mean": 0.0028569873147488703,
+    "std": 0.008555684672620745,
+    "n": 54
+   },
+   "seg_boundary_f1": {
+    "mean": 0.012241985187015768,
+    "std": 0.01614147950117321,
+    "n": 64,
+    "median": 0.0011339705167665642
+   },
+   "seg_seconds": {
+    "mean": 9.16921366751194,
+    "std": 4.833670693482155,
+    "n": 64,
+    "median": 6.36992335319519
+   },
+   "n_objects": {
+    "mean": 5.125,
+    "std": 6.981001002721601,
+    "n": 64
+   },
+   "n_degenerate_chips": 12,
+   "n_single_class_chips": 10
+  },
+  "sam_permissive": {
+   "n_chips": 64,
+   "map_oa": {
+    "mean": 0.840516209602356,
+    "std": 0.14440474939830555,
+    "n": 64,
+    "median": 0.879150390625
+   },
+   "speckle": {
+    "mean": 0.00013655424118041992,
+    "std": 0.000228513162131542,
+    "n": 64,
+    "median": 3.0517578125e-05
+   },
+   "cls_boundary_f1": {
+    "mean": 0.04454635244902656,
+    "std": 0.05113212075695433,
+    "n": 64,
+    "median": 0.03134909015597326
+   },
+   "cls_boundary_f1_multiclass": {
+    "mean": 0.052795676976624066,
+    "std": 0.05160552890541005,
+    "n": 54
+   },
+   "seg_boundary_f1": {
+    "mean": 0.051007591990226545,
+    "std": 0.05220562676999811,
+    "n": 64,
+    "median": 0.02978389147749584
+   },
+   "seg_seconds": {
+    "mean": 8.953652534633875,
+    "std": 4.925397141251592,
+    "n": 64,
+    "median": 7.378650188446045
+   },
+   "n_objects": {
+    "mean": 40.78125,
+    "std": 33.72196462896994,
+    "n": 64
+   },
+   "n_degenerate_chips": 0,
+   "n_single_class_chips": 10
+  },
+  "unet": {
+   "n_chips": 64,
+   "map_oa": {
+    "mean": 0.5271878838539124,
+    "std": 0.24286834205254051,
+    "n": 64,
+    "median": 0.5168743133544922
+   },
+   "speckle": {
+    "mean": 0.008105337619781494,
+    "std": 0.004117782752487828,
+    "n": 64,
+    "median": 0.008575439453125
+   },
+   "cls_boundary_f1": {
+    "mean": 0.07444857171471204,
+    "std": 0.06729384777938567,
+    "n": 64,
+    "median": 0.0603572555168994
+   },
+   "cls_boundary_f1_multiclass": {
+    "mean": 0.08823534425447352,
+    "std": 0.06442503699938769,
+    "n": 54
+   },
+   "seg_boundary_f1": {
+    "mean": 0.07444857171471204,
+    "std": 0.06729384777938567,
+    "n": 64,
+    "median": 0.0603572555168994
+   },
+   "seg_seconds": {
+    "mean": 0.12682952359318733,
+    "std": 0.0860674841621918,
+    "n": 64,
+    "median": 0.10888528823852539
+   },
+   "n_objects": {
+    "mean": 5.3125,
+    "std": 1.1301963325015703,
+    "n": 64
+   },
+   "n_degenerate_chips": 0,
+   "n_single_class_chips": 10,
+   "refined_map_oa": {
+    "mean": 0.7694747447967529,
+    "std": 0.2380835222776048,
+    "n": 64,
+    "median": 0.8197765350341797
+   },
+   "refined_cls_boundary_f1": {
+    "mean": 0.037164985158883876,
+    "std": 0.0728943872428735,
+    "n": 64,
+    "median": 0.0
+   }
+  }
+ }
+}

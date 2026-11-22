@@ -79,7 +79,7 @@ def fill_uncovered(labels, coverage_bg=0):
 
 
 def eval_labelmap(image, truth, parcels, labels, seed=SEED, tol_px=TOL_PX,
-                  name="", seg_seconds=None, return_maps=False):
+                  name="", seg_seconds=None, return_maps=False, n_classes=None):
     """通用下游评估：任意分割 label 图走与 SLIC 对照完全相同的协议。
 
     步骤（与 obia.baselines.slic_baseline 逐行同源）：
@@ -106,7 +106,8 @@ def eval_labelmap(image, truth, parcels, labels, seed=SEED, tol_px=TOL_PX,
     lab = fill_uncovered(labels0)
 
     feats = extract_object_features(img, lab)
-    obj_truth = object_majority_truth(lab, truth)
+    nc = int(n_classes) if n_classes is not None else int(truth.max())
+    obj_truth = object_majority_truth(lab, truth, n_classes=nc)
     res = classify_objects(feats, obj_truth, seed=seed)
     obj_map = rasterize_object_pred(lab, res["pred"])
     cm, map_oa = confusion_oa(obj_map, truth, int(truth.max()))

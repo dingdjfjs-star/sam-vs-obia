@@ -1,5 +1,7 @@
 # 当 Meta 的 SAM 遇上手写 OBIA：遥感分割的零样本正面对比
 
+> **v2（2026-11-22）：真实数据集验证已完成**，见下方 [§9 v2 章节](#9-v2真实数据验证--loveda-三方案对比)。合成场景的结论哪些成立、哪些翻转，都有了答案。
+
 > **同一幅 512²×4 波段合成场景（seed=20260829）、同一套下游分类协议、同一套指标代码**——
 > 让 segment-geospatial（Meta SAM2，零样本、只用真彩色 RGB）与
 > [obia-segmentation](https://github.com/dingdjfjs-star/obia-segmentation)（手写 Baatz & Schäpe 多尺度区域生长，4 波段全谱+19 维特征）正面对比。
@@ -128,3 +130,63 @@ AGENTS.md              项目详档（环境/命令/踩坑）
 ```
 
 姊妹项目：[obia-segmentation](https://github.com/dingdjfjs-star/obia-segmentation)（手写 OBIA 全流程）· 同系列对比口径。评测工具链：segment-geospatial 1.4.2 / sam2 (PyPI) / torch 2.6.0+cu124 / rasterio / scikit-image / scikit-learn。
+
+---
+
+## 9. v2：真实数据验证 —— LoveDA 三方案对比
+
+> **问题**：§2-§5 的结论来自自带真值的合成场景，真实影像上还成立吗？
+> **做法**：LoveDA 官方数据（RGB 1024²、7 类、无 NIR）——3 个 train 分片 → 842 图 → 3368 个 512² 芯片（U-Net 训练）；固定种子抽 16 张 validation 图 → 64 个 512² test 芯片，**三方吃同一份切片**。① 手写 OBIA（v1 协议桥接复用）② SAM2 零样本（v1 协议）③ **U-Net（手写 base32 encoder-decoder，从零训练 25 epochs，训练曲线全程落盘）**。全部数字出自 2026-11-22 实跑（results/metrics.json 单一来源，test.py 14 断言复算一致）。
+
+### 9.1 主结果
+
+| 指标（64 芯片 mean±std，括号内 median） | OBIA（scale=10 标定） | SAM2 默认 AMG | SAM2 放宽阈值 | **U-Net（训练）** |
+|---|---|---|---|---|
+| OA | **0.920±0.073**（0.935） | 0.719±0.294（0.811） | 0.841±0.144（0.879） | 0.527±0.243（0.517）* |
+| 椒盐率 | 0.0016 | 0.0000 | 0.0001 | 0.0081 |
+| 边界 F1 vs 地类 | 0.155（multi 0.183） | 0.002 | 0.045 | 0.074 |
+| 分割耗时（中位） | 75.4 s（CPU）† | 6.4 s（GPU） | 7.4 s（GPU） | **0.11 s（GPU）** |
+| 平均对象数 | 446 | 5.1（12/64 芯片零有效提案） | 40.8 | 5.3 类/芯片 |
+
+\* U-Net 主指标 = 模型本体输出（跨图泛化的独立分类器）；若沿用 v1 下游协议（把其类别图再过特征+RF）可得 refined OA 0.770（中位 0.820）——该口径含逐区域多数真值校正，偏乐观，仅作参考。**两种口径不可混着比**：OBIA/SAM 行的下游 RF 是逐芯片 60/40 真值监督（v1 传递协议，衡量分割质量），U-Net 是无测试期监督的真分类器——绝对值横向比较要带着这个差异读。
+† OBIA 耗时均值 166s 被一枚病态芯片拉爆（97 分钟，v1 记录过的"负形状链式吸收"机制在真实影像再现）；中位 75s 才是常态。
+
+### 9.2 合成结论在真实影像上的裁决
+
+| v1 结论（合成场景） | v2 裁决（LoveDA） |
+|---|---|
+| OBIA 的 OA 最高 | **成立**（0.920 vs SAM 0.719-0.841、UNet 0.527）——且注意口径差异（见 9.1 注） |
+| SAM 边界贴合赢（cls_bF1 0.62-0.95） | **翻转**：全线崩到 0.002-0.155。合成场景的"1px 壕沟"边界在真实影像上是宽渐变带，异质性准则和 AMG 都贴不准 |
+| SAM 快 24 倍 | **成立且更甚**（6.4s vs 75s 中位；U-Net 推理 0.11s 是另一个量级） |
+| SAM 默认阈值漏 23% 场景 | **恶化**：真实影像上 AMG 极保守——平均仅 5.1 个对象、12/64 芯片**零有效提案**（整片退化），v1 合成上是 28 个对象 |
+| （新发现）零样本对输入预处理敏感 | 原始 uint8 直喂 AMG 几乎失效（整图单对象，OA 4.5% 级）；2% 线性拉伸（v1 口径）后恢复到 0.955 级——**零样本工作流必须先把影像"拉到 SAM 习惯的对比度"** |
+| （新发现）训练类方案的跨域代价 | U-Net 同域监控 OA 0.749 → 跨域 test 0.527，主要失败模式是**农田→水体误认**（RGB 无 NIR 时暗色农田与水体光谱模糊）；逐区域真值后处理可救回到 0.770 |
+
+### 9.3 v2 的诚实声明
+
+- **分片子集**：U-Net 只用 3/9 个 train 分片（流量与训练时长预算），类分布与 validation 域不完全对齐（train agriculture 23%/forest 32% vs val 30%/7%）——0.527 是"小预算跨域训练"的真实水平，不代表 U-Net 在 LoveDA 全量训练上的上限（文献水平 mIoU 0.5+ 需全量+增广+更大模型）。
+- **单类芯片伪影**：10/64 个 test 芯片只有 1 个地类，边界 F 公式在零边界芯片上恒为 0——对三方一致但拉低均值，故并列报告 multiclass-only（n=54）口径。
+- **OBIA 尺度标定**：v1 结论"换数据须重新标定"照做——在一张非 test 的 validation 图上扫 scale∈{5..80}，按预注册规则（对象数 200-800 带内取最小）选中 **scale=10（417 对象）**，与 v1 合成主参数一致；标定图不入 test。
+- **SAM 输入口径**：2% 线性拉伸与 v1 的 SAM 输入定义一致（OBIA/U-Net 吃原始值）。
+- 掩码 0=ignore 在 test 芯片中占比 0（逐片核过）；OA 天然排除 ignore 像素。
+
+### 9.4 v2 图与复现
+
+![figv2-1](results/figs/figv2_1_methods.png)
+![figv2-4](results/figs/figv2_4_v1_v2.png)
+
+其余三张：figv2_2_metrics.png（四方法×四指标柱状）、figv2_3_train_curve.png（U-Net 训练曲线）、figv2_5_gallery.png（4 芯片×4 方法画廊）。
+
+```bat
+:: v2 复现（种子 20260829 全程固定；数据 ~2.3GB 不入库，见 .gitignore）
+E:\Ana\envs\samgeo\python.exe scripts\prepare_v2_data.py       :: parquet→PNG→512² 芯片
+E:\Ana\envs\samgeo\python.exe scripts\train_unet.py --epochs 25 --batch 8
+E:\Ana\envs\samgeo\python.exe scripts\run_v2_eval.py --calibrate
+E:\Ana\envs\samgeo\python.exe scripts\run_v2_eval.py --shard 0 --nshards 2   :: 与下一行并行
+E:\Ana\envs\samgeo\python.exe scripts\run_v2_eval.py --shard 1 --nshards 2
+E:\Ana\envs\samgeo\python.exe scripts\run_v2_eval.py --aggregate   :: → results/metrics.json
+E:\Ana\envs\samgeo\python.exe scripts\make_figures_v2.py
+E:\Ana\envs\samgeo\python.exe test\test.py                      :: 14 断言
+```
+
+数据通道：ModelScope/hf-mirror 实测（v2 用 hf-mirror 的 parquet 分片 mrmeepsle/LoveDa，206 实测通；LoveDA 官方需网盘）。v1 遗留的"huggingface 直连被阻 + hf-mirror 对 Xet 仓库文件 502"在本轮复测中文件通道恢复可用（元数据/文件均 206）——镜像可用性会波动，下载前先跑 tools/probe_net.py。

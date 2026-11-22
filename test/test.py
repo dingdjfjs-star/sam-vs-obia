@@ -24,10 +24,10 @@ _HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.dirname(_HERE))
 
 import obiabridge  # noqa: E402,F401
-from obia.metrics import boundary_f, salt_pepper_rate  # noqa: E402
+from obia.metrics import boundary_f, confusion_oa, salt_pepper_rate  # noqa: E402
 from obia.synthetic import generate_scene  # noqa: E402
 from scripts.common import (DATA_DIR, RESULTS_DIR, SEED, SCENE_SIZE,  # noqa: E402
-                            fill_uncovered, load_runs, runs_to_dict)
+                            eval_labelmap, fill_uncovered, load_runs, runs_to_dict)
 
 PASS = 0
 
@@ -109,6 +109,96 @@ def main():
     assert s["point"]["n"] == s["box"]["n"], "两模式样本数不一致"
     ok(f"A6 提示实验：point n={s['point']['n']} IoU={s['point']['iou_mean']:.3f} | "
        f"box n={s['box']['n']} IoU={s['box']['iou_mean']:.3f}")
+
+    # ================= v2（真实数据 + U-Net） =================
+    metrics_path = os.path.join(RESULTS_DIR, "metrics.json")
+    assert os.path.exists(metrics_path), "results/metrics.json 不存在（先跑 v2 评估）"
+    with open(metrics_path, encoding="utf-8") as f:
+        M = json.load(f)
+    ok("B1 metrics.json 存在")
+
+    need_methods = ("obia", "sam_default", "sam_permissive", "unet")
+    need_keys = ("map_oa", "speckle", "cls_boundary_f1", "seg_boundary_f1", "seg_seconds")
+    for m in need_methods:
+        assert m in M["metrics"], f"metrics.json 缺方法 {m}"
+        for k in need_keys:
+            assert "mean" in M["metrics"][m][k] and "std" in M["metrics"][m][k], \
+                f"{m}.{k} 缺 mean/std"
+        assert 0.0 <= M["metrics"][m]["map_oa"]["mean"] <= 1.0
+    ok("B2 四方法 × 五指标结构齐全（mean/std/n）")
+
+    # --- B3 逐芯片复算：v2_runs.jsonl 记录 vs 从落盘产物重算 ---
+    from PIL import Image
+    runs = load_runs("v2_runs.jsonl")
+    runs_by_name = {r["name"]: r for r in runs}
+    test_dir = os.path.join(DATA_DIR, "loveda", "test512")
+    img_dir = os.path.join(test_dir, "img")
+    chips = sorted(f for f in os.listdir(img_dir) if f.endswith(".png"))
+    assert chips, "test512 无芯片（先跑 prepare_v2_data.py）"
+    pick_chips = chips[:3]
+    for f in pick_chips:
+        stem = os.path.splitext(f)[0]
+        img = np.asarray(Image.open(os.path.join(img_dir, f)).convert("RGB"),
+                         np.float32) / 255.0
+        truth = np.asarray(Image.open(os.path.join(test_dir, "mask", f)), np.int32)
+        # OBIA：label 图重载 → 完整下游协议重算（特征+RF，与评估同源）
+        lab = np.load(os.path.join(RESULTS_DIR, "labelmaps", "v2_obia", f"{stem}.npy"))
+        rec, cmap, _ = eval_labelmap(img, truth, truth, lab, seed=SEED, tol_px=2,
+                                     name=f"v2_obia_{stem}", n_classes=7,
+                                     return_maps=True)
+        want = runs_by_name[f"v2_obia_{stem}"]
+        for key in ("map_oa", "speckle", "cls_boundary_f1", "seg_boundary_f1"):
+            assert abs(rec[key] - want[key]) < 1e-9, \
+                f"OBIA {stem}.{key} 复算 {rec[key]} ≠ 记录 {want[key]}"
+        # 通用复算：三方法的分类图直接重算四指标
+        for method in ("sam_default", "sam_permissive", "unet"):
+            cmap_m = np.load(os.path.join(RESULTS_DIR, "v2", "preds", method,
+                                          f"{stem}.npy"))
+            cm, oa = confusion_oa(cmap_m, truth, 7)
+            sp = salt_pepper_rate(cmap_m)
+            bf = boundary_f(cmap_m, truth, tol=2)["f1"]
+            wr = runs_by_name[f"v2_{method}_{stem}"]
+            assert abs(oa - wr["map_oa"]) < 1e-9, f"{method} {stem} OA 复算不符"
+            assert abs(sp - wr["speckle"]) < 1e-9, f"{method} {stem} 椒盐率复算不符"
+            assert abs(bf - wr["cls_boundary_f1"]) < 1e-9, f"{method} {stem} bF1 复算不符"
+    ok(f"B3 逐芯片复算一致（{len(pick_chips)} 芯片 × OBIA 全协议 + 三方法分类图四指标）")
+
+    # --- B4 U-Net 推理确定性 + checkpoint 哈希 ---
+    import hashlib
+    import torch
+    ckpt_path = os.path.join(RESULTS_DIR, "v2", "unet_best.pt")
+    h = hashlib.sha256(open(ckpt_path, "rb").read()).hexdigest()[:16]
+    assert h == M["unet"]["checkpoint_sha256_16"], "checkpoint 哈希与 metrics.json 不符"
+    ck = torch.load(ckpt_path, map_location="cuda", weights_only=True)
+    from scripts.unet import UNet
+    model = UNet(in_ch=3, n_classes=ck["n_classes"]).cuda().eval()
+    model.load_state_dict(ck["state_dict"])
+    stem = os.path.splitext(pick_chips[0])[0]
+    img = np.asarray(Image.open(os.path.join(img_dir, pick_chips[0])).convert("RGB"),
+                     np.float32) / 255.0
+    with torch.no_grad():
+        torch.manual_seed(SEED)
+        pred = model(torch.from_numpy(img.transpose(2, 0, 1)[None]).cuda()).argmax(1)[0]
+    saved = np.load(os.path.join(RESULTS_DIR, "v2", "preds", "unet", f"{stem}.npy"))
+    assert np.array_equal(pred.cpu().numpy(), saved), \
+        "U-Net 推理与落盘预测不一致（确定性被破坏）"
+    ok(f"B4 U-Net 推理确定性通过，checkpoint sha256_16={h}")
+
+    # --- B5 训练曲线健全 ---
+    with open(os.path.join(RESULTS_DIR, "v2", "train_log.json"), encoding="utf-8") as f:
+        tl = json.load(f)
+    eps = tl["epochs"]
+    assert len(eps) >= 2 and [e["epoch"] for e in eps] == list(
+        range(1, len(eps) + 1)), "epoch 序列异常"
+    assert all(np.isfinite(e["loss_mean"]) for e in eps), "loss 出现 NaN/Inf"
+    assert eps[-1]["monitor_oa"] > eps[0]["monitor_oa"], "监控 OA 未上升（训练无效）"
+    ok(f"B5 训练曲线健全（{len(eps)} epochs，loss 有限，OA {eps[0]['monitor_oa']:.3f}"
+       f"→{eps[-1]['monitor_oa']:.3f}）")
+
+    # --- B6 metrics.json 往返 ---
+    text = json.dumps(M, ensure_ascii=False, sort_keys=True)
+    assert json.dumps(json.loads(text), ensure_ascii=False, sort_keys=True) == text
+    ok("B6 metrics.json JSON 往返一致")
 
     print(f"\nALL {PASS} ASSERTIONS PASSED", flush=True)
 

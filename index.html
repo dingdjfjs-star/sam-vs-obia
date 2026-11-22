@@ -31,7 +31,7 @@
 <body>
 <div class="wrap">
   <h1>sam-vs-obia</h1>
-  <div class="tagline">当 Meta 的 SAM 遇上手写 OBIA：遥感分割的零样本受控对比 · 2026-11-20 实跑 · test 8 断言全绿</div>
+  <div class="tagline">当 Meta 的 SAM 遇上手写 OBIA：遥感分割的零样本受控对比 · v1 合成场景（2026-11-20）+ v2 真实数据 LoveDA（2026-11-22）· test 14 断言全绿</div>
 
   <div class="hero">
     <div class="kpi"><b>0.9505</b><span>SAM2 放宽阈值 边界 F1 vs 地类（OBIA 0.4812 的 2 倍）</span></div>
@@ -72,12 +72,25 @@
   <h2>什么条件选谁</h2>
   <table>
     <tr><th>场景</th><th>推荐</th><th>依据</th></tr>
-    <tr><td>矢量图斑 + 可解释特征 + 高 OA 自动分类（调查/变化检测入库）</td><td><b>OBIA</b></td><td>OA 0.959，NDVI/纹理/形状可解释，产物直接入库</td></tr>
-    <tr><td>贴边界的快速勾绘、样本预标注</td><td><b>SAM2</b></td><td>边界 F 高 1.4~2 倍、快 24 倍、零样本免调参</td></tr>
+    <tr><td>矢量图斑 + 可解释特征 + 高 OA 自动分类（调查/变化检测入库）</td><td><b>OBIA</b></td><td>OA 0.959（合成）/0.920（真实），NDVI/纹理/形状可解释，产物直接入库</td></tr>
+    <tr><td>贴边界的快速勾绘、样本预标注（合成/高对比影像）</td><td><b>SAM2</b></td><td>合成场景边界 F 高 1.4~2 倍、快 24 倍、零样本免调参</td></tr>
     <tr><td>小样本/无标注新区域冷启动</td><td>SAM2 + 框提示</td><td>框提示 IoU 0.87 零训练；OBIA 的 RF 仍需标注样本</td></tr>
     <tr><td>对象粒度可控（对象≈图斑）</td><td><b>OBIA</b></td><td>scale = 异质性预算；AMG 的 pps 不是尺度</td></tr>
-    <tr><td>CPU-only / 全图 100% 覆盖硬约束</td><td>OBIA</td><td>SAM 需 GPU；默认阈值漏 23%</td></tr>
+    <tr><td>CPU-only / 全图 100% 覆盖硬约束</td><td>OBIA</td><td>SAM 需 GPU；默认阈值在真实影像漏更多（12/64 芯片零提案）</td></tr>
   </table>
+
+  <h2>v2：真实数据上的裁决（LoveDA，64×512² test 芯片）</h2>
+  <p>合成结论哪些成立？<b>OBIA 的 OA 优势成立</b>（0.920 vs SAM 0.719~0.841、U-Net 0.527）；<b>"SAM 边界赢"翻转</b>——真实影像边界是宽渐变带而非合成的 1px 壕沟，SAM 边界 F 从 0.62~0.95 崩到 0.002~0.045，AMG 极保守（默认档 12/64 芯片零有效提案、平均仅 5 个对象）；<b>SAM 快</b>依旧（6.4s vs OBIA 75s 中位）。两个新发现：零样本对输入预处理极敏感（原始 uint8 几乎失效、2% 拉伸后恢复——v1 口径救了它）；训练过的 U-Net 跨域泛化有真实代价（同域 0.749 → 跨域 0.527，农田→水体误认是主失败模式）。</p>
+  <table>
+    <tr><th>方法（64 芯片 mean±std）</th><th>OA</th><th>边界 F1 vs 地类</th><th>耗时（中位）</th></tr>
+    <tr><td>手写 OBIA（scale=10 标定）</td><td><b>0.920</b>（med 0.935）</td><td>0.155</td><td>75.4s CPU</td></tr>
+    <tr><td>SAM2 默认 AMG</td><td>0.719（med 0.811）</td><td>0.002</td><td>6.4s GPU</td></tr>
+    <tr><td>SAM2 放宽阈值</td><td>0.841（med 0.879）</td><td>0.045</td><td>7.4s GPU</td></tr>
+    <tr><td>U-Net（从零训练 25 epochs）</td><td>0.527（med 0.517；refined 0.770）</td><td>0.074</td><td><b>0.11s GPU</b></td></tr>
+  </table>
+  <img class="fig" src="results/figs/figv2_1_methods.png" alt="figv2-1">
+  <img class="fig" src="results/figs/figv2_4_v1_v2.png" alt="figv2-4">
+  <p class="foot" style="color:var(--sub);font-size:12.5px">口径注意：OBIA/SAM 行的下游 RF 为逐芯片 60/40 真值监督（v1 传递协议，衡量分割质量）；U-Net 是无测试期监督的独立分类器（refined=其类别图再过 v1 下游协议的参考值）。绝对值横向比较需带此差异读。详见 README §9。</p>
 
   <div class="foot">
     姊妹项目：<a href="https://github.com/dingdjfjs-star/obia-segmentation">obia-segmentation</a>（手写 OBIA 全流程，eCognition 思路复现）·

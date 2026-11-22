@@ -1,7 +1,10 @@
-# 大体积二进制产物不入库（数字溯源靠 results/raw/*.jsonl + summary.json）
+# 大体积二进制产物不入库（数字溯源靠 results/raw/*.jsonl + summary/metrics.json）
 data/scene.npz
+data/loveda/
+data/loveda_raw/
 results/labelmaps/
 results/classmaps/
+results/v2/preds/
 results/prompt_windows.npz
 results/logs/
 __pycache__/

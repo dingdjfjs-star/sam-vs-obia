@@ -19,6 +19,10 @@ COPY_FILES = [
     "index.html", ".nojekyll", ".gitignore", "README.md", "TUTORIAL.md",
     os.path.join("data", "scene_rgb.tif"),
     os.path.join("results", "summary.json"),
+    os.path.join("results", "metrics.json"),
+    os.path.join("results", "v2", "train_log.json"),
+    os.path.join("results", "v2", "unet_best.pt"),
+    os.path.join("data", "loveda_split_manifest.json"),
 ]
 COPY_DIRS = [
     "tutorial", "scripts", "obiabridge", "test", "tools",
